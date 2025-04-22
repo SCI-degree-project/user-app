@@ -1,0 +1,108 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Kotlin specific
+*.kotlin_module
+
+# Gradle
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Gradle Wrapper
+gradle-app.setting
+
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# JetBrains Rider
+.idea/
+
+# Android Studio
+.cxx/
+.externalNativeBuild/
+captures/
+outputs/
+*.hprof
+
+# Test results
+test-results/
+test-output/
+
+# Coverage reports
+coverage/
+*.ec
+
+# Local configuration files
+local.properties
+
+# Node (if you're using it for frontend)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# dotenv
+.env
+.env.*
+
+# Jetpack Compose compiler cache
+.kotlinc/
+
+# Misc
+*.swp
+*.swo
