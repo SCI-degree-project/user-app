@@ -1,4 +1,4 @@
-package com.userapp.ui
+package com.userapp.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -15,10 +15,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
-import com.userapp.model.Product
+import com.userapp.model.ProductItem
 
 @Composable
-fun ProductCard(product: Product, modifier: Modifier = Modifier) {
+fun ProductCard(product: ProductItem, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier,
         colors = CardDefaults.cardColors(containerColor = Color.Transparent)
@@ -27,7 +27,7 @@ fun ProductCard(product: Product, modifier: Modifier = Modifier) {
             horizontalAlignment = Alignment.Start
         ) {
             Image(
-                painter = rememberAsyncImagePainter(product.imageUrl),
+                painter = rememberAsyncImagePainter(product.coverImgURl),
                 contentDescription = product.name,
                 modifier = Modifier
                     .fillMaxWidth()

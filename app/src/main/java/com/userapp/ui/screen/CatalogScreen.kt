@@ -1,10 +1,10 @@
-package com.userapp.ui
+package com.userapp.ui.screen
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
@@ -17,10 +17,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.userapp.ui.components.ProductCard
+import com.userapp.viewmodel.CatalogViewModel
 
 @Composable
-fun CatalogScreen(modifier: Modifier = Modifier) {
-    val viewModel: ProductViewModel = viewModel()
+fun CatalogScreen(
+    modifier: Modifier = Modifier,
+    onProductClick: (String) -> Unit
+) {
+    val viewModel: CatalogViewModel = viewModel()
     val products by viewModel.products.collectAsState()
 
     Column(modifier = modifier.fillMaxSize()) {
@@ -43,7 +48,8 @@ fun CatalogScreen(modifier: Modifier = Modifier) {
                 ProductCard(
                     product = product,
                     modifier = Modifier
-                        .fillMaxWidth()
+                        .fillMaxSize()
+                        .clickable { onProductClick(product.id) }
                 )
             }
         }
