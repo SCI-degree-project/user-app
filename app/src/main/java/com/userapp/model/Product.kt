@@ -1,9 +1,9 @@
-package com.user_app
+package com.userapp.model
 
 data class Product(
     val id: String,
     val name: String,
     val description: String,
-    val imageUrl: String,
-    val price: Double
+    val price: Double,
+    val imageUrl: String
 )
