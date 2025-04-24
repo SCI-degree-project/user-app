@@ -17,15 +17,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.userapp.ui.ProductCard
-import com.userapp.ui.ProductViewModel
+import com.userapp.viewmodel.CatalogViewModel
 
 @Composable
 fun CatalogScreen(
     modifier: Modifier = Modifier,
     onProductClick: (String) -> Unit
 ) {
-    val viewModel: ProductViewModel = viewModel()
+    val viewModel: CatalogViewModel = viewModel()
     val products by viewModel.products.collectAsState()
 
     Column(modifier = modifier.fillMaxSize()) {

@@ -1,4 +1,4 @@
-package com.userapp.ui
+package com.userapp.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
