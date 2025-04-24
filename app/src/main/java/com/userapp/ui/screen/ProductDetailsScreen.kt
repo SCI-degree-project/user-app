@@ -67,6 +67,14 @@ fun ProductDetailScreen(productId: String) {
                 Text(text = "$${product!!.price}", style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(text = product!!.description, style = MaterialTheme.typography.bodyLarge)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = "Style", style = MaterialTheme.typography.titleMedium)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = product!!.style, style = MaterialTheme.typography.bodyLarge)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = "Materials", style = MaterialTheme.typography.titleMedium)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = product!!.materials, style = MaterialTheme.typography.bodyLarge)
             }
         }
 
