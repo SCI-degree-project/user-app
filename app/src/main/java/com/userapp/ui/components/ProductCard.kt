@@ -1,4 +1,4 @@
-package com.userapp.ui.screen
+package com.userapp.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
