@@ -22,7 +22,7 @@ class ProductDetailsViewModel(private val productId: String) : ViewModel() {
             val fetchedProduct = ProductDetails(
                 id = productId,
                 name = "Modern Chair",
-                description = "Comfortable and stylish chair.",
+                description = "Comfortable and stylish moder chair. Ideal for your modern life.",
                 price = 230.0,
                 gallery = listOf(
                     "https://images.unsplash.com/photo-1718049720161-7eabebf6d8db?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8ZnVybml0dXJlfGVufDB8fDB8fHww",
