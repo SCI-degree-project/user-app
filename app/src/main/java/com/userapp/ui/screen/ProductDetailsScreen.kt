@@ -3,7 +3,6 @@ package com.userapp.ui.screen
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -33,12 +32,13 @@ import com.userapp.viewmodel.ProductDetailsViewModelFactory
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
+import androidx.compose.ui.res.painterResource
+import com.userapp.R
 
 @Composable
 fun ProductDetailScreen(
@@ -63,6 +63,7 @@ fun ProductDetailScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
+                .statusBarsPadding()
         ) {
             Column(
             ) {
@@ -96,7 +97,7 @@ fun ProductDetailScreen(
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
                         Icon(
-                            imageVector = Icons.Filled.Star,
+                            painter = painterResource(id = R.drawable.baseline_360_24),
                             contentDescription = "View in 3D",
                             modifier = Modifier.padding(end = 8.dp)
                         )
@@ -110,7 +111,7 @@ fun ProductDetailScreen(
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
                     ) {
                         Icon(
-                            imageVector = Icons.Filled.Star,
+                            painter = painterResource(id = R.drawable.baseline_view_in_ar_24),
                             contentDescription = "View with AR",
                             modifier = Modifier.padding(end = 8.dp)
                         )

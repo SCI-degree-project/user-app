@@ -31,7 +31,7 @@ class ProductDetailsViewModel(private val productId: String) : ViewModel() {
                     "https://images.unsplash.com/photo-1718049720170-273ba3f560aa?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1yZWxhdGVkfDEwfHx8ZW58MHx8fHx8",
                 ),
                 "Modern",
-                "Wood"
+                "Wood, Leather, Metal, Plastic"
             )
             _product.value = fetchedProduct
         }

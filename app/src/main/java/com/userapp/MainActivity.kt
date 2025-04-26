@@ -35,11 +35,11 @@ class MainActivity : ComponentActivity() {
                     val productId = backStackEntry.arguments?.getString("productId") ?: ""
                     ProductDetailScreen(
                         productId,
-                        onARButtonClick = { productId ->
-                            navController.navigate(Screen.ARScreen.createRoute(productId))
+                        onARButtonClick = { pId ->
+                            navController.navigate(Screen.ARScreen.createRoute(pId))
                         },
-                        on3DButtonClick = { productId ->
-                            navController.navigate(Screen.Model3DScreen.createRoute(productId))
+                        on3DButtonClick = { pId ->
+                            navController.navigate(Screen.Model3DScreen.createRoute(pId))
                         }
                     )
                 }
@@ -49,7 +49,7 @@ class MainActivity : ComponentActivity() {
                     arguments = listOf(navArgument("productId") { type = NavType.StringType })
                 ) { backStackEntry ->
                     val productId = backStackEntry.arguments?.getString("productId") ?: ""
-                    ARScreen(productId)
+                    ARScreen(productId, navController = navController)
                 }
 
                 composable(
