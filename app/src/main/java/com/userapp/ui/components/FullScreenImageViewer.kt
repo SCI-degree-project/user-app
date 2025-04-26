@@ -1,9 +1,7 @@
 package com.userapp.ui.components
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -25,11 +23,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import coil.compose.rememberAsyncImagePainter
+import com.userapp.R
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FullscreenImageViewer(
     images: List<String>,
@@ -43,7 +42,6 @@ fun FullscreenImageViewer(
             .background(Color.Black)
             .zIndex(1f)
             .systemBarsPadding()
-            .clickable { onDismiss() }
     ) {
         val fullScreenPagerState = rememberPagerState(
             initialPage = initialPage,
@@ -68,7 +66,7 @@ fun FullscreenImageViewer(
                 .padding(16.dp)
         ) {
             Icon(
-                Icons.AutoMirrored.Filled.ArrowBack,
+                painter = painterResource(R.drawable.baseline_arrow_back_24),
                 contentDescription = "Go Back",
                 tint = Color.White
             )

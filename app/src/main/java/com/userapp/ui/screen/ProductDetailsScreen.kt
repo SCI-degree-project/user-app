@@ -3,7 +3,6 @@ package com.userapp.ui.screen
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -30,9 +29,23 @@ import com.userapp.ui.components.FullscreenImageViewer
 import com.userapp.ui.components.ImageCarousel
 import com.userapp.viewmodel.ProductDetailsViewModel
 import com.userapp.viewmodel.ProductDetailsViewModelFactory
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.ui.res.painterResource
+import com.userapp.R
 
 @Composable
-fun ProductDetailScreen(productId: String) {
+fun ProductDetailScreen(
+    productId: String,
+    onARButtonClick: (String) -> Unit,
+    on3DButtonClick: (String) -> Unit
+) {
     val viewModel: ProductDetailsViewModel = viewModel(
         factory = ProductDetailsViewModelFactory(productId = productId)
     )
@@ -49,7 +62,17 @@ fun ProductDetailScreen(productId: String) {
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
+                .padding(16.dp)
+                .statusBarsPadding()
         ) {
+            Column(
+            ) {
+                Text(text = product!!.name, style = MaterialTheme.typography.headlineSmall)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(text = "$${product!!.price}", style = MaterialTheme.typography.titleMedium)
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
             ImageCarousel(
                 images = product!!.gallery,
                 productName = product!!.name,
@@ -60,12 +83,44 @@ fun ProductDetailScreen(productId: String) {
             )
 
             Column(
-                modifier = Modifier.padding(16.dp)
             ) {
-                Text(text = product!!.name, style = MaterialTheme.typography.headlineSmall)
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(text = "$${product!!.price}", style = MaterialTheme.typography.titleMedium)
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Button(
+                        onClick = { on3DButtonClick(productId) },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.baseline_360_24),
+                            contentDescription = "View in 3D",
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                        Text(text = "See in 3D")
+                    }
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    Button(
+                        onClick = { onARButtonClick(productId) },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.baseline_view_in_ar_24),
+                            contentDescription = "View with AR",
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                        Text(text = "See with AR")
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
                 Text(text = product!!.description, style = MaterialTheme.typography.bodyLarge)
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(text = "Style", style = MaterialTheme.typography.titleMedium)

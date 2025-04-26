@@ -57,23 +57,25 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    implementation("androidx.compose.ui:ui:1.6.0")
-    implementation("androidx.compose.material3:material3:1.2.0")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.6.0")
-    debugImplementation("androidx.compose.ui:ui-tooling:1.6.0")
+    implementation(libs.arsceneview)
 
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
+    implementation(libs.ui)
+    implementation(libs.material3)
+    implementation(libs.ui.tooling.preview)
+    debugImplementation(libs.ui.tooling)
 
-    implementation("io.coil-kt:coil-compose:2.4.0")
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
 
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation(libs.coil.compose)
 
-    implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation(libs.kotlinx.coroutines.android)
 
-    implementation("androidx.compose.foundation:foundation:1.5.0")
+    implementation(libs.androidx.navigation.compose)
 
-    implementation("com.google.accompanist:accompanist-pager:0.34.0")
-    implementation("com.google.accompanist:accompanist-pager-indicators:0.34.0")
+    implementation(libs.androidx.foundation)
+
+    implementation(libs.accompanist.pager)
+    implementation(libs.accompanist.pager.indicators)
 
 }
