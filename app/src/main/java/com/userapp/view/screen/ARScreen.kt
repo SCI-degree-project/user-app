@@ -1,4 +1,4 @@
-package com.userapp.ui.screen
+package com.userapp.view.screen
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable

@@ -1,4 +1,4 @@
-package com.userapp.ui.screen
+package com.userapp.view.screen
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,9 +24,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.userapp.R
-import com.userapp.ui.components.ProductCard
+import com.userapp.view.components.ProductCard
 import com.userapp.viewmodel.CatalogViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,7 +35,7 @@ fun CatalogScreen(
     modifier: Modifier = Modifier,
     onProductClick: (String) -> Unit
 ) {
-    val viewModel: CatalogViewModel = viewModel()
+    val viewModel: CatalogViewModel = hiltViewModel()
     val products by viewModel.products.collectAsState()
 
     Scaffold(
@@ -75,7 +75,7 @@ fun CatalogScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 contentPadding = PaddingValues(bottom = 16.dp)
             ) {
-                items(products) { product ->
+                items(products, key = { it.id }) { product ->
                     ProductCard(
                         product = product,
                         modifier = Modifier

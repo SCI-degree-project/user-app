@@ -1,4 +1,4 @@
-package com.userapp.ui.screen
+package com.userapp.view.screen
 
 sealed class Screen(val route: String) {
     object Catalog : Screen("catalog")

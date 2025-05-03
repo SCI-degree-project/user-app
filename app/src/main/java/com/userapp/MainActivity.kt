@@ -9,12 +9,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.userapp.ui.screen.ARScreen
-import com.userapp.ui.screen.CatalogScreen
-import com.userapp.ui.screen.Model3DScreen
-import com.userapp.ui.screen.ProductDetailScreen
-import com.userapp.ui.screen.Screen
+import com.userapp.view.screen.ARScreen
+import com.userapp.view.screen.CatalogScreen
+import com.userapp.view.screen.Model3DScreen
+import com.userapp.view.screen.ProductDetailScreen
+import com.userapp.view.screen.Screen
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
