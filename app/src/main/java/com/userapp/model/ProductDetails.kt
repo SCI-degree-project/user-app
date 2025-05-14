@@ -8,6 +8,7 @@ data class ProductDetails(
     val materials: List<String>,
     val style: String,
     val tenantId: String,
-    val gallery: List<String> = emptyList()
+    val gallery: List<String>,
+    val model: String
 )
 

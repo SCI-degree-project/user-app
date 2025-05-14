@@ -20,7 +20,7 @@ import com.userapp.model.ProductItem
 
 @Composable
 fun ProductCard(product: ProductItem, modifier: Modifier = Modifier) {
-    val imageUrl = product.coverImgURl.orEmpty()
+    val imageUrl = product.cover.orEmpty()
 
     Card(
         modifier = modifier,

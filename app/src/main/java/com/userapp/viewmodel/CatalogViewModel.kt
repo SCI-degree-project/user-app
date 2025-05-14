@@ -17,7 +17,7 @@ class CatalogViewModel @Inject constructor(
     private val _products = MutableStateFlow<List<ProductItem>>(emptyList())
     val products: StateFlow<List<ProductItem>> = _products
 
-    private var page = 0
+    private var page = 1
     private val size = 10
     private val tenantId = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
 
@@ -29,10 +29,12 @@ class CatalogViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val products = repository.getProducts(tenantId, page, size)
-                _products.value = products
+                _products.value = products.content
             } catch (e: RuntimeException) {
                 e.printStackTrace()
             }
         }
     }
 }
+
+

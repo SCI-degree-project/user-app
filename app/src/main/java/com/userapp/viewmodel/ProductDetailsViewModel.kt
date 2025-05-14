@@ -30,12 +30,7 @@ class ProductDetailsViewModel @AssistedInject constructor(
             try {
                 val result = repository.getProductById(tenantId, productId)
 
-                Log.d("ProductDetail", "Received: $result")
-                val withGallery = result.copy(
-                    gallery = listOf("https://via.placeholder.com/600x400?text=Image+1")
-                )
-
-                _product.value = withGallery
+                _product.value = result
             } catch (e: Exception) {
                 _product.value = null
             }
