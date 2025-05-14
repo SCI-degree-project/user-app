@@ -1,4 +1,4 @@
-package com.user_app
+package com.userapp
 
 import org.junit.Test
 
