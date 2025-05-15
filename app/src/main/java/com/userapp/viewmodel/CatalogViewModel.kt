@@ -17,9 +17,11 @@ class CatalogViewModel @Inject constructor(
     private val _products = MutableStateFlow<List<ProductItem>>(emptyList())
     val products: StateFlow<List<ProductItem>> = _products
 
-    private var page = 1
-    private val size = 10
+    private var page = 0
+    private val size = 20
     private val tenantId = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+    val _errorMessage = MutableStateFlow<String?>(null)
+    val errorMessage: StateFlow<String?> = _errorMessage
 
     init {
         fetchProducts()
@@ -27,10 +29,12 @@ class CatalogViewModel @Inject constructor(
 
     private fun fetchProducts() {
         viewModelScope.launch {
+
             try {
                 val products = repository.getProducts(tenantId, page, size)
                 _products.value = products.content
             } catch (e: RuntimeException) {
+                _errorMessage.value = e.message ?: "Unknown error"
                 e.printStackTrace()
             }
         }

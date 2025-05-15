@@ -38,6 +38,12 @@ fun CatalogScreen(
     val viewModel: CatalogViewModel = hiltViewModel()
     val products by viewModel.products.collectAsState()
 
+    val errorMessage by viewModel.errorMessage.collectAsState()
+    if (errorMessage != null) {
+        Text(text = errorMessage ?: "", color = Color.Red)
+    }
+
+
     Scaffold(
         topBar = {
             TopAppBar(
