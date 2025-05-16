@@ -40,7 +40,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import com.userapp.R
 import com.userapp.viewmodel.ProductDetailsViewModelFactoryProvider
+import com.userapp.viewmodel.uistate.UiState
 import dagger.hilt.android.EntryPointAccessors
+import com.userapp.model.ProductDetails
 
 @Composable
 fun ProductDetailScreen(
@@ -61,18 +63,47 @@ fun ProductDetailScreen(
         factory.create("3fa85f64-5717-4562-b3fc-2c963f66afa6", productId)
     }
 
-    val product by viewModel.product.collectAsState()
+    val productState by viewModel.productState.collectAsState()
+
+    when (val state = productState) {
+        is UiState.Loading -> {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        }
+
+        is UiState.Error -> {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(text = state.message, color = MaterialTheme.colorScheme.error)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(onClick = { viewModel.fetchProductDetails() }) {
+                        Text("Retry")
+                    }
+                }
+            }
+        }
+
+        is UiState.Success -> {
+            ProductDetailContent(
+                product = state.data,
+                onARButtonClick = onARButtonClick,
+                on3DButtonClick = on3DButtonClick
+            )
+        }
+    }
+}
+
+@Composable
+fun ProductDetailContent(
+    product: ProductDetails,
+    onARButtonClick: (String) -> Unit,
+    on3DButtonClick: (String) -> Unit
+) {
     var showFullScreenGallery by remember { mutableStateOf(false) }
     var currentFullScreenImageIndex by remember { mutableIntStateOf(0) }
 
-    val safeProduct = product ?: return Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        CircularProgressIndicator()
-    }
-
-    val gallery = safeProduct.gallery.ifEmpty {
+    val gallery = product.gallery.ifEmpty {
         listOf("https://via.placeholder.com/600x400?text=No+Image")
     }
 
@@ -85,12 +116,12 @@ fun ProductDetailScreen(
     ) {
         Column {
             Text(
-                text = safeProduct.name.ifBlank { "No name product" },
+                text = product.name.ifBlank { "No name product" },
                 style = MaterialTheme.typography.headlineSmall
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "$${safeProduct.price}",
+                text = "$${product.price}",
                 style = MaterialTheme.typography.titleMedium
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -98,7 +129,7 @@ fun ProductDetailScreen(
 
         ImageCarousel(
             images = gallery,
-            productName = safeProduct.name,
+            productName = product.name,
             onImageClick = { index ->
                 currentFullScreenImageIndex = index
                 showFullScreenGallery = true
@@ -114,7 +145,7 @@ fun ProductDetailScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Button(
-                    onClick = { on3DButtonClick(productId) },
+                    onClick = { on3DButtonClick(product.id) },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
                     Icon(
@@ -128,7 +159,7 @@ fun ProductDetailScreen(
                 Spacer(modifier = Modifier.width(16.dp))
 
                 Button(
-                    onClick = { onARButtonClick(productId) },
+                    onClick = { onARButtonClick(product.id) },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
                 ) {
                     Icon(
@@ -141,17 +172,17 @@ fun ProductDetailScreen(
             }
 
             Spacer(modifier = Modifier.height(12.dp))
-            Text(text = safeProduct.description.ifBlank { "No description" }, style = MaterialTheme.typography.bodyLarge)
+            Text(text = product.description.ifBlank { "No description" }, style = MaterialTheme.typography.bodyLarge)
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = "Style", style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = safeProduct.style.ifBlank { "Undefined" }, style = MaterialTheme.typography.bodyLarge)
+            Text(text = product.style.ifBlank { "Undefined" }, style = MaterialTheme.typography.bodyLarge)
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = "Materials", style = MaterialTheme.typography.titleMedium)
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = if (safeProduct.materials.isNotEmpty()) {
-                    safeProduct.materials.joinToString(", ")
+                text = if (product.materials.isNotEmpty()) {
+                    product.materials.joinToString(", ")
                 } else {
                     "Undefined"
                 },
@@ -168,7 +199,7 @@ fun ProductDetailScreen(
         FullscreenImageViewer(
             images = gallery,
             initialPage = currentFullScreenImageIndex,
-            productName = safeProduct.name,
+            productName = product.name,
             onDismiss = { showFullScreenGallery = false }
         )
     }

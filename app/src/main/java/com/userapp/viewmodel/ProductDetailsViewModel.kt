@@ -1,10 +1,10 @@
 package com.userapp.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.userapp.data.ProductRepository
 import com.userapp.model.ProductDetails
+import com.userapp.viewmodel.uistate.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -18,21 +18,22 @@ class ProductDetailsViewModel @AssistedInject constructor(
     @Assisted("productId") private val productId: String
 ) : ViewModel() {
 
-    private val _product = MutableStateFlow<ProductDetails?>(null)
-    val product: StateFlow<ProductDetails?> = _product
+    private val _productState = MutableStateFlow<UiState<ProductDetails>>(UiState.Loading)
+    val productState: StateFlow<UiState<ProductDetails>> = _productState
 
     init {
         fetchProductDetails()
     }
 
-    private fun fetchProductDetails() {
+    fun fetchProductDetails() {
         viewModelScope.launch {
+            _productState.value = UiState.Loading
             try {
                 val result = repository.getProductById(tenantId, productId)
-
-                _product.value = result
+                _productState.value = UiState.Success(result)
             } catch (e: Exception) {
-                _product.value = null
+                _productState.value = UiState.Error("Error loading product: ${e.message ?: "Unknown error"}")
+                e.printStackTrace()
             }
         }
     }
