@@ -27,22 +27,15 @@ import androidx.compose.ui.unit.dp
 import com.userapp.view.components.FullscreenImageViewer
 import com.userapp.view.components.ImageCarousel
 import com.userapp.viewmodel.ProductDetailsViewModel
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import com.userapp.R
 import com.userapp.viewmodel.ProductDetailsViewModelFactoryProvider
 import com.userapp.viewmodel.uistate.UiState
 import dagger.hilt.android.EntryPointAccessors
 import com.userapp.model.ProductDetails
+import com.userapp.view.components.ProductActions
 
 @Composable
 fun ProductDetailScreen(
@@ -139,37 +132,12 @@ fun ProductDetailContent(
         Column {
             Spacer(modifier = Modifier.height(12.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Button(
-                    onClick = { on3DButtonClick(product.id) },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_360_24),
-                        contentDescription = "View in 3D",
-                        modifier = Modifier.padding(end = 8.dp)
-                    )
-                    Text(text = "See in 3D")
-                }
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                Button(
-                    onClick = { onARButtonClick(product.id) },
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.baseline_view_in_ar_24),
-                        contentDescription = "View with AR",
-                        modifier = Modifier.padding(end = 8.dp)
-                    )
-                    Text(text = "See with AR")
-                }
-            }
+            ProductActions(
+                productId = product.id,
+                modelUrl = product.model,
+                on3DButtonClick = on3DButtonClick,
+                onARButtonClick = onARButtonClick
+            )
 
             Spacer(modifier = Modifier.height(12.dp))
             Text(text = product.description.ifBlank { "No description" }, style = MaterialTheme.typography.bodyLarge)
