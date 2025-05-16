@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.userapp.data.ProductRepository
 import com.userapp.model.ProductItem
+import com.userapp.viewmodel.uistate.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,27 +15,27 @@ import javax.inject.Inject
 class CatalogViewModel @Inject constructor(
     private val repository: ProductRepository
 ) : ViewModel() {
-    private val _products = MutableStateFlow<List<ProductItem>>(emptyList())
-    val products: StateFlow<List<ProductItem>> = _products
+    private val _productsState = MutableStateFlow<UiState<List<ProductItem>>>(UiState.Loading)
+    val productsState: StateFlow<UiState<List<ProductItem>>> = _productsState
 
     private var page = 0
     private val size = 20
     private val tenantId = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-    val _errorMessage = MutableStateFlow<String?>(null)
+    private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
 
     init {
         fetchProducts()
     }
 
-    private fun fetchProducts() {
+    fun fetchProducts() {
         viewModelScope.launch {
-
+            _productsState.value = UiState.Loading
             try {
                 val products = repository.getProducts(tenantId, page, size)
-                _products.value = products.content
-            } catch (e: RuntimeException) {
-                _errorMessage.value = e.message ?: "Unknown error"
+                _productsState.value = UiState.Success(products.content)
+            } catch (e: Exception) {
+                _productsState.value = UiState.Error("Error loading products: ${e.message ?: "Unknown error"}")
                 e.printStackTrace()
             }
         }

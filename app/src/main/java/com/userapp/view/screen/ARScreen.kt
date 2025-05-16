@@ -40,7 +40,17 @@ fun ARScreen(
     val view = rememberView(engine = engine)
     val frame = remember { mutableStateOf<Frame?>(null) }
 
-    val isPlaneDetected by derivedStateOf { isPlaneTracking(frame.value) }
+    val hasDetectedPlane = remember { mutableStateOf(false) }
+
+    val isPlaneCurrentlyTracked = remember(frame.value) {
+        isPlaneTracking(frame.value)
+    }
+
+    LaunchedEffect(isPlaneCurrentlyTracked) {
+        if (isPlaneCurrentlyTracked && !hasDetectedPlane.value) {
+            hasDetectedPlane.value = true
+        }
+    }
 
     if (hasCameraPermission) {
         Box(modifier = Modifier
@@ -60,7 +70,7 @@ fun ARScreen(
                 },
             )
 
-            if (!isPlaneDetected) {
+            if (!hasDetectedPlane.value) {
                 Card(
                     modifier = Modifier
                         .align(Alignment.Center)
