@@ -6,6 +6,6 @@ import dagger.hilt.components.SingletonComponent
 
 @EntryPoint
 @InstallIn(SingletonComponent::class)
-interface ProductDetailsViewModelFactoryProvider {
-    fun productDetailsViewModelFactory(): ProductDetailsViewModel.Factory
+interface Product3DModelViewModelFactoryProvider {
+    fun product3DModelViewModelFactory(): Product3DModelViewModel.Factory
 }
