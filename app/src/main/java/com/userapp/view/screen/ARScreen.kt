@@ -21,6 +21,9 @@ import com.google.ar.core.Config
 import com.google.ar.core.Frame
 import com.google.ar.core.Plane
 import com.google.ar.core.TrackingState
+import com.userapp.viewmodel.Product3DModelViewModel
+import com.userapp.viewmodel.Product3DModelViewModelFactoryProvider
+import dagger.hilt.android.EntryPointAccessors
 import io.github.sceneview.ar.ARScene
 import io.github.sceneview.ar.rememberARCameraNode
 import io.github.sceneview.rememberEngine
@@ -33,6 +36,24 @@ fun ARScreen(
     navController: NavController
 ) {
     val context = LocalContext.current
+    val factory = remember {
+        EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            Product3DModelViewModelFactoryProvider::class.java
+        ).product3DModelViewModelFactory()
+    }
+
+    val viewModel: Product3DModelViewModel = remember {
+        factory.create("3fa85f64-5717-4562-b3fc-2c963f66afa6", productId)
+    }
+
+    val modelUrl by viewModel.modelUrl.collectAsState()
+
+    if (!modelUrl.isNullOrBlank()) {
+        // TODO: render model
+    } else {
+        CircularProgressIndicator()
+    }
     val hasCameraPermission = rememberCameraPermissionState(navController)
 
     val engine = rememberEngine()
