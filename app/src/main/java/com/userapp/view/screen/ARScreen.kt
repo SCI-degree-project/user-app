@@ -3,12 +3,9 @@ package com.userapp.view.screen
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
-import android.net.Uri
-import android.os.Build
 import android.view.MotionEvent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -26,24 +23,21 @@ import com.google.ar.core.Anchor
 import com.google.ar.core.Config
 import com.google.ar.core.Frame
 import com.google.ar.core.Plane
-import com.google.ar.core.TrackingFailureReason
 import com.google.ar.core.TrackingState
 import com.userapp.viewmodel.Product3DModelViewModel
 import com.userapp.viewmodel.Product3DModelViewModelFactoryProvider
+import com.userapp.viewmodel.uistate.UiState
 import dagger.hilt.android.EntryPointAccessors
 import io.github.sceneview.ar.ARScene
 import io.github.sceneview.ar.arcore.createAnchorOrNull
 import io.github.sceneview.ar.arcore.isValid
 import io.github.sceneview.ar.node.AnchorNode
 import io.github.sceneview.ar.rememberARCameraNode
-import io.github.sceneview.loaders.MaterialLoader
 import io.github.sceneview.loaders.ModelLoader
-import io.github.sceneview.model.ModelInstance
 import io.github.sceneview.node.ModelNode
 import io.github.sceneview.node.Node
 import io.github.sceneview.rememberCollisionSystem
 import io.github.sceneview.rememberEngine
-import io.github.sceneview.rememberMaterialLoader
 import io.github.sceneview.rememberModelLoader
 import io.github.sceneview.rememberNodes
 import io.github.sceneview.rememberOnGestureListener
@@ -68,11 +62,6 @@ fun ARScreen(
     }
 
     val modelUrl by viewModel.modelUrl.collectAsState()
-
-    val modelUrlChecked = remember { mutableStateOf(false) }
-
-
-
     val hasCameraPermission = rememberCameraPermissionState(navController)
 
     val engine = rememberEngine()
@@ -80,12 +69,14 @@ fun ARScreen(
     val view = rememberView(engine = engine)
     val frame = remember { mutableStateOf<Frame?>(null) }
     val modelLoader = rememberModelLoader(engine = engine)
-    val materialLoader = rememberMaterialLoader(engine = engine)
     val childNodes = rememberNodes()
     val collisionSystem = rememberCollisionSystem(view = view)
-    val trackingFailureReason = remember { mutableStateOf<TrackingFailureReason?>(null) }
+
     val isModelPlaced = remember { mutableStateOf(false) }
     val hasDetectedPlane = remember { mutableStateOf(false) }
+
+    val modelPlacementState = remember { mutableStateOf<UiState<AnchorNode>>(UiState.Loading) }
+    val modelLoadState = remember { mutableStateOf<UiState<ModelNode>>(UiState.Loading) }
 
     val isPlaneCurrentlyTracked = remember(frame.value) {
         isPlaneTracking(frame.value)
@@ -97,10 +88,30 @@ fun ARScreen(
         }
     }
 
+    LaunchedEffect(modelUrl) {
+        if (!modelUrl.isNullOrBlank()) {
+            modelLoadState.value = UiState.Loading
+            modelLoader.loadModelInstanceAsync(
+                fileLocation = modelUrl!!,
+                onResult = { instance ->
+                    if (instance != null) {
+                        val modelNode = ModelNode(
+                            modelInstance = instance,
+                            scaleToUnits = 1.0f
+                        ).apply {
+                            isEditable = false
+                        }
+                        modelLoadState.value = UiState.Success(modelNode)
+                    } else {
+                        modelLoadState.value = UiState.Error("Failed to load 3D model")
+                    }
+                }
+            )
+        }
+    }
+
     if (hasCameraPermission) {
-        Box(modifier = Modifier
-            .fillMaxSize()
-        ) {
+        Box(modifier = Modifier.fillMaxSize()) {
             ARScene(
                 modifier = Modifier.fillMaxSize(),
                 engine = engine,
@@ -114,13 +125,12 @@ fun ARScreen(
                     config.lightEstimationMode = Config.LightEstimationMode.ENVIRONMENTAL_HDR
                 },
                 modelLoader = modelLoader,
-                materialLoader = materialLoader,
                 childNodes = childNodes,
                 collisionSystem = collisionSystem,
-                onTrackingFailureChanged = { trackingFailureReason.value = it },
-
                 onGestureListener = rememberOnGestureListener(
-                    onSingleTapConfirmed = { e: MotionEvent, node: Node? ->
+                    onSingleTapConfirmed = onSingleTapConfirmed@{ e: MotionEvent, node: Node? ->
+                        val modelNode = (modelLoadState.value as? UiState.Success)?.data ?: return@onSingleTapConfirmed
+
                         if (!isModelPlaced.value && node == null) {
                             val hitResult = frame.value
                                 ?.hitTest(e.x, e.y)
@@ -128,43 +138,58 @@ fun ARScreen(
                                 ?.createAnchorOrNull()
 
                             hitResult?.let { anchor ->
+                                val anchorNode = AnchorNode(engine = engine, anchor = anchor)
+                                anchorNode.addChildNode(modelNode)
+                                childNodes += anchorNode
                                 isModelPlaced.value = true
-
-                                placeModelFromUrl(
-                                    engine = engine,
-                                    modelLoader = modelLoader,
-                                    anchor = anchor,
-                                    modelUrl = modelUrl!!,
-                                    onReady = { anchorNode ->
-                                        childNodes += anchorNode
-                                    }
-                                )
                             }
                         }
                     }
+
+
                 )
             )
 
             if (!hasDetectedPlane.value) {
-                Card(
+                CircularProgressIndicator(
                     modifier = Modifier
-                        .align(Alignment.Center)
-                        .padding(16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.Black.copy(alpha = 0.6f)
-                    )
-                ) {
-                    Text(
-                        text = "Detecting surfaces...",
-                        modifier = Modifier.padding(16.dp),
-                        color = Color.White,
-                        style = MaterialTheme.typography.bodyMedium
+                        .align(Alignment.TopEnd)
+                        .padding(16.dp)
+                        .statusBarsPadding(),
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+
+            when (val state = modelLoadState.value) {
+                is UiState.Loading -> CenterCard(
+                    message = "Downloading 3D model...",
+                    showLoader = true,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+
+                is UiState.Error -> CenterCard(
+                    message = state.message,
+                    showRetry = true,
+                    onRetry = { modelLoadState.value = UiState.Loading },
+                    modifier = Modifier.align(Alignment.Center)
+                )
+
+                is UiState.Success -> if (!isModelPlaced.value) {
+                    CenterCard(
+                        message = "Press to anchor the object...",
+                        modifier = Modifier.align(Alignment.Center)
                     )
                 }
             }
 
+
             IconButton(
-                onClick = { navController.popBackStack() },
+                onClick = {
+                    childNodes.forEach {
+                        (it as? AnchorNode)?.detachAnchor()
+                    }
+                    navController.popBackStack()
+                },
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .padding(16.dp)
@@ -175,6 +200,39 @@ fun ARScreen(
                     contentDescription = "Back",
                     tint = Color.White
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun CenterCard(
+    message: String,
+    showLoader: Boolean = false,
+    showRetry: Boolean = false,
+    onRetry: (() -> Unit)? = null,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.padding(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.Black.copy(alpha = 0.6f)
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (showLoader) {
+                CircularProgressIndicator(color = Color.White)
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+            Text(text = message, color = Color.White)
+            if (showRetry && onRetry != null) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Button(onClick = onRetry) {
+                    Text("Retry")
+                }
             }
         }
     }
@@ -218,7 +276,7 @@ fun placeModelFromUrl(
     modelLoader: ModelLoader,
     anchor: Anchor,
     modelUrl: String,
-    onReady: (AnchorNode) -> Unit
+    onResult: (UiState<AnchorNode>) -> Unit
 ) {
     modelLoader.loadModelInstanceAsync(
         fileLocation = modelUrl,
@@ -234,7 +292,9 @@ fun placeModelFromUrl(
                 }
 
                 anchorNode.addChildNode(modelNode)
-                onReady(anchorNode)
+                onResult(UiState.Success(anchorNode))
+            } else {
+                onResult(UiState.Error("Failed to load 3D model"))
             }
         }
     )
