@@ -42,6 +42,7 @@ import io.github.sceneview.rememberModelLoader
 import io.github.sceneview.rememberNodes
 import io.github.sceneview.rememberOnGestureListener
 import io.github.sceneview.rememberView
+import kotlinx.coroutines.delay
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
@@ -75,8 +76,9 @@ fun ARScreen(
     val isModelPlaced = remember { mutableStateOf(false) }
     val hasDetectedPlane = remember { mutableStateOf(false) }
 
-    val modelPlacementState = remember { mutableStateOf<UiState<AnchorNode>>(UiState.Loading) }
     val modelLoadState = remember { mutableStateOf<UiState<ModelNode>>(UiState.Loading) }
+
+    val modelNodeRef = remember { mutableStateOf<ModelNode?>(null) }
 
     val isPlaneCurrentlyTracked = remember(frame.value) {
         isPlaneTracking(frame.value)
@@ -101,12 +103,22 @@ fun ARScreen(
                         ).apply {
                             isEditable = false
                         }
+
+                        modelNodeRef.value = modelNode
                         modelLoadState.value = UiState.Success(modelNode)
                     } else {
                         modelLoadState.value = UiState.Error("Failed to load 3D model")
                     }
                 }
             )
+        }
+    }
+
+    LaunchedEffect(modelNodeRef.value) {
+        val modelNode = modelNodeRef.value ?: return@LaunchedEffect
+        while (true) {
+            modelNode.rotation.y += 1f
+            delay(16L)
         }
     }
 
@@ -129,7 +141,10 @@ fun ARScreen(
                 collisionSystem = collisionSystem,
                 onGestureListener = rememberOnGestureListener(
                     onSingleTapConfirmed = onSingleTapConfirmed@{ e: MotionEvent, node: Node? ->
-                        val modelNode = (modelLoadState.value as? UiState.Success)?.data ?: return@onSingleTapConfirmed
+                        val modelNode = modelNodeRef.value ?: return@onSingleTapConfirmed
+
+                        modelNode.isEditable = true
+                        modelNode.isScaleEditable = false
 
                         if (!isModelPlaced.value && node == null) {
                             val hitResult = frame.value
@@ -269,33 +284,4 @@ fun isPlaneTracking(frame: Frame?): Boolean {
     return frame
         ?.getUpdatedTrackables(Plane::class.java)
         ?.any { it.trackingState == TrackingState.TRACKING } == true
-}
-
-fun placeModelFromUrl(
-    engine: Engine,
-    modelLoader: ModelLoader,
-    anchor: Anchor,
-    modelUrl: String,
-    onResult: (UiState<AnchorNode>) -> Unit
-) {
-    modelLoader.loadModelInstanceAsync(
-        fileLocation = modelUrl,
-        onResult = { modelInstance ->
-            if (modelInstance != null) {
-                val anchorNode = AnchorNode(engine = engine, anchor = anchor)
-
-                val modelNode = ModelNode(
-                    modelInstance = modelInstance,
-                    scaleToUnits = 1.0f
-                ).apply {
-                    isEditable = false
-                }
-
-                anchorNode.addChildNode(modelNode)
-                onResult(UiState.Success(anchorNode))
-            } else {
-                onResult(UiState.Error("Failed to load 3D model"))
-            }
-        }
-    )
 }
