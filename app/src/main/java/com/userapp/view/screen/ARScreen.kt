@@ -18,12 +18,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
-import com.google.android.filament.Engine
-import com.google.ar.core.Anchor
 import com.google.ar.core.Config
 import com.google.ar.core.Frame
 import com.google.ar.core.Plane
 import com.google.ar.core.TrackingState
+import com.userapp.view.components.CenterCard
 import com.userapp.viewmodel.Product3DModelViewModel
 import com.userapp.viewmodel.Product3DModelViewModelFactoryProvider
 import com.userapp.viewmodel.uistate.UiState
@@ -33,7 +32,6 @@ import io.github.sceneview.ar.arcore.createAnchorOrNull
 import io.github.sceneview.ar.arcore.isValid
 import io.github.sceneview.ar.node.AnchorNode
 import io.github.sceneview.ar.rememberARCameraNode
-import io.github.sceneview.loaders.ModelLoader
 import io.github.sceneview.node.ModelNode
 import io.github.sceneview.node.Node
 import io.github.sceneview.rememberCollisionSystem
@@ -80,16 +78,6 @@ fun ARScreen(
 
     val modelNodeRef = remember { mutableStateOf<ModelNode?>(null) }
 
-    val isPlaneCurrentlyTracked = remember(frame.value) {
-        isPlaneTracking(frame.value)
-    }
-
-    LaunchedEffect(isPlaneCurrentlyTracked) {
-        if (isPlaneCurrentlyTracked && !hasDetectedPlane.value) {
-            hasDetectedPlane.value = true
-        }
-    }
-
     LaunchedEffect(modelUrl) {
         if (!modelUrl.isNullOrBlank()) {
             modelLoadState.value = UiState.Loading
@@ -114,9 +102,11 @@ fun ARScreen(
         }
     }
 
-    LaunchedEffect(modelNodeRef.value) {
+    val isAnimating = remember { mutableStateOf(true) }
+
+    LaunchedEffect(modelNodeRef.value, isAnimating.value) {
         val modelNode = modelNodeRef.value ?: return@LaunchedEffect
-        while (true) {
+        while (isAnimating.value) {
             modelNode.rotation.y += 1f
             delay(16L)
         }
@@ -130,7 +120,13 @@ fun ARScreen(
                 cameraNode = cameraNode,
                 view = view,
                 planeRenderer = true,
-                onSessionUpdated = { _, updatedFrame -> frame.value = updatedFrame },
+                onSessionUpdated = { _, updatedFrame ->
+                    frame.value = updatedFrame
+
+                    if (!hasDetectedPlane.value && isPlaneTracking(updatedFrame)) {
+                        hasDetectedPlane.value = true
+                    }
+                },
                 sessionConfiguration = { session, config ->
                     config.depthMode = if (session.isDepthModeSupported(Config.DepthMode.AUTOMATIC))
                         Config.DepthMode.AUTOMATIC else Config.DepthMode.DISABLED
@@ -147,10 +143,12 @@ fun ARScreen(
                         modelNode.isScaleEditable = false
 
                         if (!isModelPlaced.value && node == null) {
-                            val hitResult = frame.value
-                                ?.hitTest(e.x, e.y)
-                                ?.firstOrNull { it.isValid(depthPoint = false, point = false) }
+                            val currentFrame = frame.value ?: return@onSingleTapConfirmed
+                            val hitResult = currentFrame
+                                .hitTest(e.x, e.y)
+                                .firstOrNull { it.isValid(depthPoint = false, point = false) }
                                 ?.createAnchorOrNull()
+
 
                             hitResult?.let { anchor ->
                                 val anchorNode = AnchorNode(engine = engine, anchor = anchor)
@@ -160,49 +158,26 @@ fun ARScreen(
                             }
                         }
                     }
-
-
                 )
             )
 
-            if (!hasDetectedPlane.value) {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .padding(16.dp)
-                        .statusBarsPadding(),
-                    color = MaterialTheme.colorScheme.primary
-                )
+            val overlayMessage = when {
+                !hasDetectedPlane.value -> "Aim at the ground to scan it"
+                !isModelPlaced.value -> "Press to place the object"
+                else -> null
             }
 
-            when (val state = modelLoadState.value) {
-                is UiState.Loading -> CenterCard(
-                    message = "Downloading 3D model...",
-                    showLoader = true,
+            overlayMessage?.let {
+                CenterCard(
+                    message = it,
                     modifier = Modifier.align(Alignment.Center)
                 )
-
-                is UiState.Error -> CenterCard(
-                    message = state.message,
-                    showRetry = true,
-                    onRetry = { modelLoadState.value = UiState.Loading },
-                    modifier = Modifier.align(Alignment.Center)
-                )
-
-                is UiState.Success -> if (!isModelPlaced.value) {
-                    CenterCard(
-                        message = "Press to anchor the object...",
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
             }
-
 
             IconButton(
                 onClick = {
-                    childNodes.forEach {
-                        (it as? AnchorNode)?.detachAnchor()
-                    }
+                    childNodes.clear()
+                    isAnimating.value = false
                     navController.popBackStack()
                 },
                 modifier = Modifier
@@ -215,39 +190,6 @@ fun ARScreen(
                     contentDescription = "Back",
                     tint = Color.White
                 )
-            }
-        }
-    }
-}
-
-@Composable
-fun CenterCard(
-    message: String,
-    showLoader: Boolean = false,
-    showRetry: Boolean = false,
-    onRetry: (() -> Unit)? = null,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier.padding(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.Black.copy(alpha = 0.6f)
-        )
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            if (showLoader) {
-                CircularProgressIndicator(color = Color.White)
-                Spacer(modifier = Modifier.height(12.dp))
-            }
-            Text(text = message, color = Color.White)
-            if (showRetry && onRetry != null) {
-                Spacer(modifier = Modifier.height(12.dp))
-                Button(onClick = onRetry) {
-                    Text("Retry")
-                }
             }
         }
     }
