@@ -3,6 +3,7 @@ package com.userapp.view.screen
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.view.MotionEvent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -21,13 +22,25 @@ import com.google.ar.core.Config
 import com.google.ar.core.Frame
 import com.google.ar.core.Plane
 import com.google.ar.core.TrackingState
+import com.userapp.view.components.CenterCard
 import com.userapp.viewmodel.Product3DModelViewModel
 import com.userapp.viewmodel.Product3DModelViewModelFactoryProvider
+import com.userapp.viewmodel.uistate.UiState
 import dagger.hilt.android.EntryPointAccessors
 import io.github.sceneview.ar.ARScene
+import io.github.sceneview.ar.arcore.createAnchorOrNull
+import io.github.sceneview.ar.arcore.isValid
+import io.github.sceneview.ar.node.AnchorNode
 import io.github.sceneview.ar.rememberARCameraNode
+import io.github.sceneview.node.ModelNode
+import io.github.sceneview.node.Node
+import io.github.sceneview.rememberCollisionSystem
 import io.github.sceneview.rememberEngine
+import io.github.sceneview.rememberModelLoader
+import io.github.sceneview.rememberNodes
+import io.github.sceneview.rememberOnGestureListener
 import io.github.sceneview.rememberView
+import kotlinx.coroutines.delay
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
@@ -48,69 +61,125 @@ fun ARScreen(
     }
 
     val modelUrl by viewModel.modelUrl.collectAsState()
-
-    if (!modelUrl.isNullOrBlank()) {
-        // TODO: render model
-    } else {
-        CircularProgressIndicator()
-    }
     val hasCameraPermission = rememberCameraPermissionState(navController)
 
     val engine = rememberEngine()
     val cameraNode = rememberARCameraNode(engine = engine)
     val view = rememberView(engine = engine)
     val frame = remember { mutableStateOf<Frame?>(null) }
+    val modelLoader = rememberModelLoader(engine = engine)
+    val childNodes = rememberNodes()
+    val collisionSystem = rememberCollisionSystem(view = view)
 
+    val isModelPlaced = remember { mutableStateOf(false) }
     val hasDetectedPlane = remember { mutableStateOf(false) }
 
-    val isPlaneCurrentlyTracked = remember(frame.value) {
-        isPlaneTracking(frame.value)
+    val modelLoadState = remember { mutableStateOf<UiState<ModelNode>>(UiState.Loading) }
+
+    val modelNodeRef = remember { mutableStateOf<ModelNode?>(null) }
+
+    LaunchedEffect(modelUrl) {
+        if (!modelUrl.isNullOrBlank()) {
+            modelLoadState.value = UiState.Loading
+            modelLoader.loadModelInstanceAsync(
+                fileLocation = modelUrl!!,
+                onResult = { instance ->
+                    if (instance != null) {
+                        val modelNode = ModelNode(
+                            modelInstance = instance,
+                            scaleToUnits = 1.0f
+                        ).apply {
+                            isEditable = false
+                        }
+
+                        modelNodeRef.value = modelNode
+                        modelLoadState.value = UiState.Success(modelNode)
+                    } else {
+                        modelLoadState.value = UiState.Error("Failed to load 3D model")
+                    }
+                }
+            )
+        }
     }
 
-    LaunchedEffect(isPlaneCurrentlyTracked) {
-        if (isPlaneCurrentlyTracked && !hasDetectedPlane.value) {
-            hasDetectedPlane.value = true
+    val isAnimating = remember { mutableStateOf(true) }
+
+    LaunchedEffect(modelNodeRef.value, isAnimating.value) {
+        val modelNode = modelNodeRef.value ?: return@LaunchedEffect
+        while (isAnimating.value) {
+            modelNode.rotation.y += 1f
+            delay(16L)
         }
     }
 
     if (hasCameraPermission) {
-        Box(modifier = Modifier
-            .fillMaxSize()
-        ) {
+        Box(modifier = Modifier.fillMaxSize()) {
             ARScene(
                 modifier = Modifier.fillMaxSize(),
                 engine = engine,
                 cameraNode = cameraNode,
                 view = view,
                 planeRenderer = true,
-                onSessionUpdated = { _, updatedFrame -> frame.value = updatedFrame },
+                onSessionUpdated = { _, updatedFrame ->
+                    frame.value = updatedFrame
+
+                    if (!hasDetectedPlane.value && isPlaneTracking(updatedFrame)) {
+                        hasDetectedPlane.value = true
+                    }
+                },
                 sessionConfiguration = { session, config ->
                     config.depthMode = if (session.isDepthModeSupported(Config.DepthMode.AUTOMATIC))
                         Config.DepthMode.AUTOMATIC else Config.DepthMode.DISABLED
                     config.lightEstimationMode = Config.LightEstimationMode.ENVIRONMENTAL_HDR
                 },
+                modelLoader = modelLoader,
+                childNodes = childNodes,
+                collisionSystem = collisionSystem,
+                onGestureListener = rememberOnGestureListener(
+                    onSingleTapConfirmed = onSingleTapConfirmed@{ e: MotionEvent, node: Node? ->
+                        val modelNode = modelNodeRef.value ?: return@onSingleTapConfirmed
+
+                        modelNode.isEditable = true
+                        modelNode.isScaleEditable = false
+
+                        if (!isModelPlaced.value && node == null) {
+                            val currentFrame = frame.value ?: return@onSingleTapConfirmed
+                            val hitResult = currentFrame
+                                .hitTest(e.x, e.y)
+                                .firstOrNull { it.isValid(depthPoint = false, point = false) }
+                                ?.createAnchorOrNull()
+
+
+                            hitResult?.let { anchor ->
+                                val anchorNode = AnchorNode(engine = engine, anchor = anchor)
+                                anchorNode.addChildNode(modelNode)
+                                childNodes += anchorNode
+                                isModelPlaced.value = true
+                            }
+                        }
+                    }
+                )
             )
 
-            if (!hasDetectedPlane.value) {
-                Card(
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .padding(16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.Black.copy(alpha = 0.6f)
-                    )
-                ) {
-                    Text(
-                        text = "Detecting surfaces...",
-                        modifier = Modifier.padding(16.dp),
-                        color = Color.White,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
+            val overlayMessage = when {
+                !hasDetectedPlane.value -> "Aim at the ground to scan it"
+                !isModelPlaced.value -> "Press to place the object"
+                else -> null
+            }
+
+            overlayMessage?.let {
+                CenterCard(
+                    message = it,
+                    modifier = Modifier.align(Alignment.Center)
+                )
             }
 
             IconButton(
-                onClick = { navController.popBackStack() },
+                onClick = {
+                    childNodes.clear()
+                    isAnimating.value = false
+                    navController.popBackStack()
+                },
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .padding(16.dp)
