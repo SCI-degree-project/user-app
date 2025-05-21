@@ -11,9 +11,11 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.userapp.view.screen.ARScreen
 import com.userapp.view.screen.CatalogScreen
+import com.userapp.view.screen.FavoritesScreen
 import com.userapp.view.screen.Model3DScreen
 import com.userapp.view.screen.ProductDetailScreen
 import com.userapp.view.screen.Screen
+import com.userapp.view.screen.SearchScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -25,9 +27,12 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             NavHost(navController = navController, startDestination = Screen.Catalog.route) {
                 composable(Screen.Catalog.route) {
-                    CatalogScreen(onProductClick = { productId ->
+                    CatalogScreen(
+                        navController = navController,
+                        onProductClick = { productId ->
                         navController.navigate(Screen.ProductDetail.createRoute(productId))
-                    })
+                        }
+                    )
                 }
 
                 composable(
@@ -60,6 +65,18 @@ class MainActivity : ComponentActivity() {
                 ) { backStackEntry ->
                     val productId = backStackEntry.arguments?.getString("productId") ?: ""
                     Model3DScreen(productId)
+                }
+
+                composable(Screen.Favorites.route) {
+                    FavoritesScreen(
+                        navController = navController,
+                    )
+                }
+
+                composable(Screen.Search.route) {
+                    SearchScreen(
+                        navController = navController,
+                    )
                 }
             }
         }

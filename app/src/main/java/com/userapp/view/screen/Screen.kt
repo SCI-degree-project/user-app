@@ -14,4 +14,8 @@ sealed class Screen(val route: String) {
     object Model3DScreen : Screen("product3DView/{productId}") {
         fun createRoute(productId: String) = "product3DView/$productId"
     }
+
+    object Favorites : Screen("favorites")
+
+    object Search : Screen("search")
 }
