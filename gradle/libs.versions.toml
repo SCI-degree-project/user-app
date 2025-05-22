@@ -24,6 +24,8 @@ converterGson = "2.11.0"
 hiltAndroid = "2.56.2"
 hiltAndroidCompiler = "2.51.1"
 hiltNavigationCompose = "1.2.0"
+roomRuntime = "2.7.1"
+roomCompiler = "2.7.1"
 
 [libraries]
 accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanistPermissions" }
@@ -59,6 +61,9 @@ converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomCompiler" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomRuntime" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
