@@ -31,7 +31,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.userapp.R
+import com.userapp.view.components.BottomNavigationBar
 import com.userapp.view.components.ProductCard
 import com.userapp.viewmodel.CatalogViewModel
 import com.userapp.viewmodel.uistate.UiState
@@ -40,6 +42,7 @@ import com.userapp.viewmodel.uistate.UiState
 @Composable
 fun CatalogScreen(
     modifier: Modifier = Modifier,
+    navController: NavController,
     onProductClick: (String) -> Unit
 ) {
     val viewModel: CatalogViewModel = hiltViewModel()
@@ -65,7 +68,12 @@ fun CatalogScreen(
                     }
                 }
             )
+        },
+
+        bottomBar = {
+            BottomNavigationBar(navController)
         }
+
     ) { innerPadding ->
         Box(
             modifier = modifier
