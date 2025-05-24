@@ -14,7 +14,6 @@ import dagger.assisted.AssistedInject
 
 class ProductDetailsViewModel @AssistedInject constructor(
     private val repository: ProductRepository,
-    @Assisted("tenantId") private val tenantId: String,
     @Assisted("productId") private val productId: String
 ) : ViewModel() {
 
@@ -29,7 +28,7 @@ class ProductDetailsViewModel @AssistedInject constructor(
         viewModelScope.launch {
             _productState.value = UiState.Loading
             try {
-                val result = repository.getProductById(tenantId, productId)
+                val result = repository.getProductById(productId)
                 _productState.value = UiState.Success(result)
             } catch (e: Exception) {
                 _productState.value = UiState.Error("Error loading product: ${e.message ?: "Unknown error"}")
@@ -41,7 +40,6 @@ class ProductDetailsViewModel @AssistedInject constructor(
     @AssistedFactory
     interface Factory {
         fun create(
-            @Assisted("tenantId") tenantId: String,
             @Assisted("productId") productId: String
         ): ProductDetailsViewModel
     }

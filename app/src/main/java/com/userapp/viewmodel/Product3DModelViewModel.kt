@@ -13,7 +13,6 @@ import dagger.assisted.AssistedFactory
 
 class Product3DModelViewModel @AssistedInject constructor(
     private val repository: ProductRepository,
-    @Assisted("tenantId") private val tenantId: String,
     @Assisted("productId") private val productId: String
 ) : ViewModel() {
 
@@ -23,7 +22,7 @@ class Product3DModelViewModel @AssistedInject constructor(
     init {
         viewModelScope.launch {
             try {
-                val product = repository.getProductById(tenantId, productId)
+                val product = repository.getProductById(productId)
                 _modelUrl.value = product.model.takeIf { it.isNotEmpty() }
             } catch (e: Exception) {
                 _modelUrl.value = null
@@ -34,7 +33,6 @@ class Product3DModelViewModel @AssistedInject constructor(
     @AssistedFactory
     interface Factory {
         fun create(
-            @Assisted("tenantId") tenantId: String,
             @Assisted("productId") productId: String
         ): Product3DModelViewModel
     }

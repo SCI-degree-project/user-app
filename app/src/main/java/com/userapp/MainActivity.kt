@@ -42,6 +42,7 @@ class MainActivity : ComponentActivity() {
                     val productId = backStackEntry.arguments?.getString("productId") ?: ""
                     ProductDetailScreen(
                         productId,
+                        navController,
                         onARButtonClick = { pId ->
                             navController.navigate(Screen.ARScreen.createRoute(pId))
                         },
@@ -70,6 +71,9 @@ class MainActivity : ComponentActivity() {
                 composable(Screen.Favorites.route) {
                     FavoritesScreen(
                         navController = navController,
+                        onProductClick = { productId ->
+                            navController.navigate(Screen.ProductDetail.createRoute(productId))
+                        }
                     )
                 }
 

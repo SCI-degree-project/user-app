@@ -58,14 +58,6 @@ fun CatalogScreen(
                         fontSize = 24.sp,
                         color = Color.Black
                     )
-                },
-                actions = {
-                    IconButton(onClick = { /* TODO: Search */ }) {
-                        Icon(
-                            painter = painterResource(R.drawable.baseline_search_24),
-                            contentDescription = "Search"
-                        )
-                    }
                 }
             )
         },
