@@ -13,8 +13,11 @@ class ProductRepository @Inject constructor(
         return apiService.getMovies(tenantId, page, size)
     }
 
-    suspend fun getProductById(tenantId: String, productId: String): ProductDetails {
-        return apiService.getProductById(tenantId, productId)
+    suspend fun getProductById(productId: String): ProductDetails {
+        return apiService.getProductById(productId)
     }
 
+    suspend fun getProductsBatch(productIds: List<String>): List<ProductItem> {
+        return apiService.getProductsBatch(productIds)
+    }
 }

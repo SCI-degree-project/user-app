@@ -13,4 +13,10 @@ interface ProductDao {
 
     @Query("SELECT * FROM favorite_products")
     suspend fun getFavoriteProducts(): List<FavoriteProductEntity>
+
+    @Query("DELETE FROM favorite_products WHERE productId = :productId")
+    suspend fun removeFavoriteProduct(productId: String)
+
+    @Query("SELECT EXISTS(SELECT 1 FROM favorite_products WHERE productId = :productId LIMIT 1)")
+    suspend fun isProductFavorite(productId: String): Boolean
 }

@@ -3,7 +3,9 @@ package com.userapp.services
 import com.userapp.model.PaginatedResponse
 import com.userapp.model.ProductDetails
 import com.userapp.model.ProductItem
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -15,10 +17,13 @@ interface ProductsApiService {
         @Query("size") size: Int
     ): PaginatedResponse<ProductItem>
 
-    @GET("api/products/{tenantId}/{productId}")
+    @GET("api/products/id/{productId}")
     suspend fun getProductById(
-        @Path("tenantId") tenantId: String,
         @Path("productId") productId: String
     ): ProductDetails
 
+    @POST("api/products/batch")
+    suspend fun getProductsBatch(
+        @Body ids: List<String>
+    ): List<ProductItem>
 }

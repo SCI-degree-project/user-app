@@ -21,8 +21,6 @@ class CatalogViewModel @Inject constructor(
     private var page = 0
     private val size = 20
     private val tenantId = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-    private val _errorMessage = MutableStateFlow<String?>(null)
-    val errorMessage: StateFlow<String?> = _errorMessage
 
     init {
         fetchProducts()

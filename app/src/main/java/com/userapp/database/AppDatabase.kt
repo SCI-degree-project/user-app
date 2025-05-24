@@ -7,7 +7,7 @@ import com.userapp.database.entities.FavoriteProductEntity
 
 @Database(
     entities = [FavoriteProductEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase: RoomDatabase() {
