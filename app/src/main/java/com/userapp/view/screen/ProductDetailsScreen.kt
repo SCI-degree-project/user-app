@@ -29,14 +29,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.userapp.view.components.FullscreenImageViewer
 import com.userapp.view.components.ImageCarousel
-import com.userapp.viewmodel.ProductDetailsViewModel
+import com.userapp.viewmodel.product.ProductDetailsViewModel
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material.Scaffold
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -46,12 +46,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.userapp.R
-import com.userapp.viewmodel.ProductDetailsViewModelFactoryProvider
+import com.userapp.viewmodel.product.ProductDetailsViewModelFactoryProvider
 import com.userapp.viewmodel.uistate.UiState
 import dagger.hilt.android.EntryPointAccessors
 import com.userapp.model.ProductDetails
 import com.userapp.view.components.ProductActions
-import com.userapp.viewmodel.FavoritesViewModel
+import com.userapp.viewmodel.favorites.FavoritesViewModel
 import kotlinx.coroutines.launch
 
 @Composable

@@ -23,8 +23,8 @@ import com.google.ar.core.Frame
 import com.google.ar.core.Plane
 import com.google.ar.core.TrackingState
 import com.userapp.view.components.CenterCard
-import com.userapp.viewmodel.Product3DModelViewModel
-import com.userapp.viewmodel.Product3DModelViewModelFactoryProvider
+import com.userapp.viewmodel.ar.Product3DModelViewModel
+import com.userapp.viewmodel.ar.Product3DModelViewModelFactoryProvider
 import com.userapp.viewmodel.uistate.UiState
 import dagger.hilt.android.EntryPointAccessors
 import io.github.sceneview.ar.ARScene

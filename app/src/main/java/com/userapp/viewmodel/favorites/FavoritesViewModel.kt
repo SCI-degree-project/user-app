@@ -1,4 +1,4 @@
-package com.userapp.viewmodel
+package com.userapp.viewmodel.favorites
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -30,7 +30,7 @@ class FavoritesViewModel @Inject constructor(
         }
     }
 
-    init {
+    fun getFavorites() {
         viewModelScope.launch {
             val favoriteEntities = dao.getFavoriteProducts()
             val ids = favoriteEntities.map { it.productId }

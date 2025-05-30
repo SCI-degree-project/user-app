@@ -80,6 +80,9 @@ class MainActivity : ComponentActivity() {
                 composable(Screen.Search.route) {
                     SearchScreen(
                         navController = navController,
+                        onProductClick = { productId ->
+                            navController.navigate(Screen.ProductDetail.createRoute(productId))
+                        }
                     )
                 }
             }
