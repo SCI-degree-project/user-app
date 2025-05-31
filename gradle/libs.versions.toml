@@ -1,6 +1,6 @@
 [versions]
 accompanistPermissions = "0.34.0"
-agp = "8.8.2"
+agp = "8.10.1"
 coilCompose = "2.4.0"
 core = "1.48.0"
 foundation = "1.8.0"

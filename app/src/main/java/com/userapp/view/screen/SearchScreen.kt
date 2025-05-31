@@ -1,5 +1,6 @@
 package com.userapp.view.screen
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,8 +21,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.userapp.R
 import com.userapp.view.components.BottomNavigationBar
+import com.userapp.view.components.FilterDialog
 import com.userapp.view.components.SearchBar
 import com.userapp.view.components.StaggeredProductGrid
+import com.userapp.viewmodel.search.SearchHistoryViewModel
 import com.userapp.viewmodel.search.SearchViewModel
 import com.userapp.viewmodel.uistate.UiState
 import kotlinx.coroutines.FlowPreview
@@ -35,18 +38,18 @@ fun SearchScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
     viewModel: SearchViewModel = hiltViewModel(),
+    historyViewModel: SearchHistoryViewModel = hiltViewModel(),
     onProductClick: (String) -> Unit
 ) {
     var query by remember { mutableStateOf(TextFieldValue("")) }
     val searchResults by viewModel.searchResults.collectAsState()
+    var lastSubmittedQuery by remember { mutableStateOf("") }
+    var isEditing by remember { mutableStateOf(false) }
+    val history by historyViewModel.searchHistory.collectAsState()
 
-    LaunchedEffect(Unit) {
-        snapshotFlow { query.text }
-            .debounce(500)
-            .distinctUntilChanged()
-            .filter { it.length >= 2 }
-            .collect { viewModel.searchProducts(it) }
-    }
+    var sortBy by remember { mutableStateOf("name") }
+    var sortDirection by remember { mutableStateOf("asc") }
+    var showFilterDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) }
@@ -65,17 +68,93 @@ fun SearchScreen(
 
                 SearchBar(
                     query = query,
-                    onQueryChange = { query = it },
+                    onQueryChange = {
+                        query = it
+                        isEditing = true
+                    },
+                    onSearch = {
+                        if (query.text.length >= 2) {
+                            lastSubmittedQuery = query.text
+                            viewModel.searchProducts(query.text, sortBy, sortDirection)
+                            historyViewModel.saveQuery(query.text)
+                            isEditing = false
+                        }
+                    },
                     modifier = Modifier.weight(1f)
                 )
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                IconButton(onClick = { }) {
+                IconButton(onClick = { showFilterDialog = true }) {
                     Icon(
                         painter = painterResource(id = R.drawable.baseline_tune_24),
                         contentDescription = "Filters"
                     )
+                }
+            }
+
+            if (showFilterDialog) {
+                FilterDialog(
+                    currentSortBy = sortBy,
+                    currentDirection = sortDirection,
+                    onDismiss = { showFilterDialog = false },
+                    onApply = { newSortBy, newDirection ->
+                        sortBy = newSortBy
+                        sortDirection = newDirection
+                        viewModel.searchProducts(query.text, newSortBy, newDirection)
+                        showFilterDialog = false
+                    }
+                )
+            }
+
+            if (history.isNotEmpty() && isEditing) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = "Recent Searches",
+                    style = MaterialTheme.typography.titleSmall,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+
+                Column {
+                    history.forEach { item ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.baseline_search_24),
+                                contentDescription = "History",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(end = 8.dp)
+                            )
+
+                            Text(
+                                text = item.query,
+                                style = MaterialTheme.typography.bodyMedium,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clickable {
+                                        query = TextFieldValue(item.query)
+                                        lastSubmittedQuery = item.query
+                                        viewModel.searchProducts(item.query, sortBy, sortDirection)
+                                        historyViewModel.saveQuery(item.query)
+                                        isEditing = false
+                                    }
+                            )
+
+                            IconButton(
+                                onClick = { historyViewModel.deleteHistoryItem(item.query) }
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.baseline_close_24),
+                                    contentDescription = "Delete",
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
+                    }
                 }
             }
 

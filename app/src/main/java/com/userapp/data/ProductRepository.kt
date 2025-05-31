@@ -22,16 +22,7 @@ class ProductRepository @Inject constructor(
         return apiService.getProductsBatch(productIds)
     }
 
-    suspend fun searchProducts(query: String): List<ProductItem> {
-        val criteria = ProductSearchCriteria(
-            name = query,
-            style = null,
-            materials = emptyList(),
-            sortBy = null,
-            direction = null,
-            page = 0,
-            size = 20
-        )
+    suspend fun searchProducts(criteria: ProductSearchCriteria): List<ProductItem> {
         return apiService.searchProducts(criteria).content
     }
 }
