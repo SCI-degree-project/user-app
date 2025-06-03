@@ -23,8 +23,8 @@ fun BottomNavigationBar(navController: NavController) {
         ),
         BottomNavItem(
             route = Screen.Search.route,
-            iconRes = R.drawable.baseline_search_24,
-            selectedIconRes = R.drawable.baseline_search_26,
+            iconRes = R.drawable.outline_search_28,
+            selectedIconRes = R.drawable.bold_outline_search_28,
             description = "Search"
         ),
         BottomNavItem(
