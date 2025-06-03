@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -27,12 +28,7 @@ import com.userapp.view.components.StaggeredProductGrid
 import com.userapp.viewmodel.search.SearchHistoryViewModel
 import com.userapp.viewmodel.search.SearchViewModel
 import com.userapp.viewmodel.uistate.UiState
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 
-@OptIn(FlowPreview::class)
 @Composable
 fun SearchScreen(
     modifier: Modifier = Modifier,
@@ -41,7 +37,9 @@ fun SearchScreen(
     historyViewModel: SearchHistoryViewModel = hiltViewModel(),
     onProductClick: (String) -> Unit
 ) {
-    var query by remember { mutableStateOf(TextFieldValue("")) }
+    var query by rememberSaveable(stateSaver = TextFieldValue.Saver) {
+        mutableStateOf(TextFieldValue(""))
+    }
     val searchResults by viewModel.searchResults.collectAsState()
     var lastSubmittedQuery by remember { mutableStateOf("") }
     var isEditing by remember { mutableStateOf(false) }
@@ -70,16 +68,16 @@ fun SearchScreen(
                     query = query,
                     onQueryChange = {
                         query = it
-                        isEditing = true
                     },
                     onSearch = {
+                        isEditing = false
                         if (query.text.length >= 2) {
                             lastSubmittedQuery = query.text
                             viewModel.searchProducts(query.text, sortBy, sortDirection)
                             historyViewModel.saveQuery(query.text)
-                            isEditing = false
                         }
                     },
+                    onFocus = { isEditing = true },
                     modifier = Modifier.weight(1f)
                 )
 

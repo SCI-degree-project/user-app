@@ -64,8 +64,6 @@ fun FavoritesScreen(
                 StaggeredProductGrid(
                     products = favorites,
                     modifier = modifier,
-                    isFavorite = true,
-                    isInFavoritesScreen = true,
                     onProductClick = onProductClick
                 )
             }

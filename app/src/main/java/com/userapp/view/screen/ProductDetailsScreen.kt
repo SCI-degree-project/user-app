@@ -201,9 +201,9 @@ fun ProductDetailContent(
                 IconButton(onClick = onToggleFavorite) {
                     Icon(
                         painter = if (isFavorite)
-                            painterResource(id = R.drawable.baseline_star_24)
+                            painterResource(id = R.drawable.baseline_bookmark_24)
                         else
-                            painterResource(id = R.drawable.baseline_star_border_24),
+                            painterResource(id = R.drawable.rounded_bookmark_24),
                         contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
                     )
                 }

@@ -1,5 +1,6 @@
 package com.userapp.view.components
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -13,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
@@ -24,7 +26,8 @@ fun SearchBar(
     query: TextFieldValue,
     onQueryChange: (TextFieldValue) -> Unit,
     onSearch: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onFocus: () -> Unit
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -51,18 +54,29 @@ fun SearchBar(
                         .fillMaxSize(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (query.text.isEmpty()) {
-                        Text(
-                            text = "Search...",
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        if (query.text.isEmpty()) {
+                            Text(
+                                text = "Search...",
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
                             )
-                        )
+                        }
+                        innerTextField()
                     }
-                    innerTextField()
                 }
             },
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .onFocusChanged { focusState ->
+                    if (focusState.isFocused) {
+                        onFocus()
+                    }
+                }
         )
     }
 }

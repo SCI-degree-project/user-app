@@ -22,13 +22,8 @@ fun StaggeredProductGrid(
     products: List<ProductItem>,
     modifier: Modifier = Modifier,
     columns: Int = 2,
-    isFavorite: Boolean = false,
-    isInFavoritesScreen: Boolean = false,
     onProductClick: (String) -> Unit,
-    viewModel: FavoritesViewModel = hiltViewModel()
 ) {
-    val coroutineScope = rememberCoroutineScope()
-
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(columns),
         modifier = modifier.fillMaxSize(),
@@ -40,13 +35,6 @@ fun StaggeredProductGrid(
             ProductCard(
                 modifier = modifier.clickable { onProductClick(product.id) },
                 product = product,
-                isInFavoriteScreen = isInFavoritesScreen,
-                isFavorite = isFavorite,
-                onToggleFavorite = {
-                    coroutineScope.launch {
-                        viewModel.toggleFavorite(product.id)
-                    }
-                }
             )
         }
     }
