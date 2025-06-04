@@ -3,6 +3,7 @@ package com.userapp.data
 import com.userapp.model.PaginatedResponse
 import com.userapp.model.ProductDetails
 import com.userapp.model.ProductItem
+import com.userapp.model.ProductSearchCriteria
 import com.userapp.services.ProductsApiService
 import javax.inject.Inject
 
@@ -19,5 +20,9 @@ class ProductRepository @Inject constructor(
 
     suspend fun getProductsBatch(productIds: List<String>): List<ProductItem> {
         return apiService.getProductsBatch(productIds)
+    }
+
+    suspend fun searchProducts(criteria: ProductSearchCriteria): List<ProductItem> {
+        return apiService.searchProducts(criteria).content
     }
 }

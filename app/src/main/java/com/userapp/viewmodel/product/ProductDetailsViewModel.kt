@@ -1,4 +1,4 @@
-package com.userapp.viewmodel
+package com.userapp.viewmodel.product
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

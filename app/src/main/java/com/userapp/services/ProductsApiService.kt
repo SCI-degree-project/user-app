@@ -3,6 +3,7 @@ package com.userapp.services
 import com.userapp.model.PaginatedResponse
 import com.userapp.model.ProductDetails
 import com.userapp.model.ProductItem
+import com.userapp.model.ProductSearchCriteria
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -26,4 +27,9 @@ interface ProductsApiService {
     suspend fun getProductsBatch(
         @Body ids: List<String>
     ): List<ProductItem>
+
+    @POST("api/products/search")
+    suspend fun searchProducts(
+        @Body criteria: ProductSearchCriteria
+    ): PaginatedResponse<ProductItem>
 }

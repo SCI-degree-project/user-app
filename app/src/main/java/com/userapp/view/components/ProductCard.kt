@@ -27,9 +27,6 @@ import com.userapp.model.ProductItem
 fun ProductCard(
     product: ProductItem,
     modifier: Modifier = Modifier,
-    isInFavoriteScreen: Boolean = false,
-    isFavorite: Boolean = false,
-    onToggleFavorite: () -> Unit = {}
 ) {
     val imageUrl = product.cover.orEmpty()
 
@@ -82,18 +79,6 @@ fun ProductCard(
                         .weight(1f)
                         .padding(4.dp)
                 )
-
-                if (isInFavoriteScreen) {
-                    IconButton(onClick = onToggleFavorite) {
-                        Icon(
-                            painter = if (isFavorite)
-                                painterResource(id = R.drawable.baseline_star_24)
-                            else
-                                painterResource(id = R.drawable.baseline_star_border_24),
-                            contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
-                        )
-                    }
-                }
             }
 
         }
