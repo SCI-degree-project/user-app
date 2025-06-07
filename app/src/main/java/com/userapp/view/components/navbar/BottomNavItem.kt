@@ -1,4 +1,4 @@
-package com.userapp.view.components
+package com.userapp.view.components.navbar
 
 data class BottomNavItem(
     val route: String,

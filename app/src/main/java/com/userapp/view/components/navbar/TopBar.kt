@@ -1,4 +1,4 @@
-package com.userapp.view.components
+package com.userapp.view.components.navbar
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth

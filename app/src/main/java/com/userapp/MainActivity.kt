@@ -65,7 +65,10 @@ class MainActivity : ComponentActivity() {
                     arguments = listOf(navArgument("productId") { type = NavType.StringType })
                 ) { backStackEntry ->
                     val productId = backStackEntry.arguments?.getString("productId") ?: ""
-                    Model3DScreen(productId)
+                    Model3DScreen(
+                        productId,
+                        navController = navController,
+                    )
                 }
 
                 composable(Screen.Favorites.route) {

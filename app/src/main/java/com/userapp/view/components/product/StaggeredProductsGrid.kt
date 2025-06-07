@@ -1,4 +1,4 @@
-package com.userapp.view.components
+package com.userapp.view.components.product
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -9,13 +9,9 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.userapp.model.ProductItem
-import com.userapp.viewmodel.favorites.FavoritesViewModel
-import kotlinx.coroutines.launch
 
 @Composable
 fun StaggeredProductGrid(
