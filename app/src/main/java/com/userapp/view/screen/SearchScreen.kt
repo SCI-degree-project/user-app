@@ -21,10 +21,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.userapp.R
-import com.userapp.view.components.BottomNavigationBar
-import com.userapp.view.components.FilterDialog
-import com.userapp.view.components.SearchBar
-import com.userapp.view.components.StaggeredProductGrid
+import com.userapp.view.components.navbar.BottomNavigationBar
+import com.userapp.view.components.search.FilterDialog
+import com.userapp.view.components.search.SearchBar
+import com.userapp.view.components.product.StaggeredProductGrid
 import com.userapp.viewmodel.search.SearchHistoryViewModel
 import com.userapp.viewmodel.search.SearchViewModel
 import com.userapp.viewmodel.uistate.UiState

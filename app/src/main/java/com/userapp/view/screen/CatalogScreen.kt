@@ -1,17 +1,11 @@
 package com.userapp.view.screen
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
@@ -24,10 +18,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.userapp.view.components.BottomNavigationBar
-import com.userapp.view.components.ProductCard
-import com.userapp.view.components.StaggeredProductGrid
-import com.userapp.view.components.TopBar
+import com.userapp.view.components.navbar.BottomNavigationBar
+import com.userapp.view.components.product.StaggeredProductGrid
+import com.userapp.view.components.navbar.TopBar
 import com.userapp.viewmodel.catalog.CatalogViewModel
 import com.userapp.viewmodel.uistate.UiState
 

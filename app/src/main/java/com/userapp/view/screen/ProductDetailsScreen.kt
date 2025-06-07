@@ -27,8 +27,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.userapp.view.components.FullscreenImageViewer
-import com.userapp.view.components.ImageCarousel
+import com.userapp.view.components.product.FullscreenImageViewer
+import com.userapp.view.components.product.ImageCarousel
 import com.userapp.viewmodel.product.ProductDetailsViewModel
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
@@ -50,7 +50,7 @@ import com.userapp.viewmodel.product.ProductDetailsViewModelFactoryProvider
 import com.userapp.viewmodel.uistate.UiState
 import dagger.hilt.android.EntryPointAccessors
 import com.userapp.model.ProductDetails
-import com.userapp.view.components.ProductActions
+import com.userapp.view.components.product.ProductActions
 import com.userapp.viewmodel.favorites.FavoritesViewModel
 import kotlinx.coroutines.launch
 

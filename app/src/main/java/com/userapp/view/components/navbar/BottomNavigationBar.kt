@@ -1,4 +1,4 @@
-package com.userapp.view.components
+package com.userapp.view.components.navbar
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar

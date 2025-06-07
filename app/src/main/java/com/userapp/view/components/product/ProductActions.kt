@@ -1,4 +1,4 @@
-package com.userapp.view.components
+package com.userapp.view.components.product
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
