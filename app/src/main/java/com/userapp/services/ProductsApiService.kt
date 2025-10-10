@@ -12,7 +12,7 @@ import retrofit2.http.Query
 
 interface ProductsApiService {
     @GET("api/products/{tenantId}")
-    suspend fun getMovies(
+    suspend fun getProducts(
         @Path("tenantId") tenantId: String,
         @Query("page") page: Int,
         @Query("size") size: Int

@@ -21,6 +21,7 @@ import androidx.navigation.NavController
 import com.userapp.view.components.navbar.BottomNavigationBar
 import com.userapp.view.components.product.StaggeredProductGrid
 import com.userapp.view.components.navbar.TopBar
+import com.userapp.view.components.profile.StoreProfileComponent
 import com.userapp.viewmodel.catalog.CatalogViewModel
 import com.userapp.viewmodel.uistate.UiState
 
@@ -34,17 +35,9 @@ fun CatalogScreen(
     val uiState by viewModel.productsState.collectAsState()
 
     Scaffold(
-        topBar = {
-            TopBar(
-                title = "Catalog",
-                modifier = modifier
-            )
-        },
-
         bottomBar = {
             BottomNavigationBar(navController)
         }
-
     ) { innerPadding ->
         Box(
             modifier = modifier
@@ -66,6 +59,9 @@ fun CatalogScreen(
                     }
                 }
                 is UiState.Success -> {
+/*
+                    StoreProfileComponent()
+*/
                     val products = (uiState as UiState.Success).data
                     StaggeredProductGrid(
                         products = products,
