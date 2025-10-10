@@ -1,30 +1,40 @@
 package com.userapp.viewmodel.profile
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.userapp.data.StoreRepository
+import com.userapp.model.StoreDetails
+import com.userapp.viewmodel.uistate.UiState
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class StoreProfileViewModel : ViewModel() {
-    private val _store = mutableStateOf(
-        StoreDto(
-            name = "Muebles Cochabamba",
-            description = "Tienda especializada en muebles de alta calidad para el hogar y oficina.",
-            address = "Av. América #123, Cochabamba, Bolivia",
-            phone = "+591 70012345",
-            facebookURL = "https://www.facebook.com/mueblescocha",
-            instagramURL = "https://www.instagram.com/mueblescocha",
-            tiktokURL = null
-        )
-    )
-    val store: State<StoreDto> = _store
+@HiltViewModel
+class StoreProfileViewModel @Inject constructor(
+    private val repository: StoreRepository
+) : ViewModel() {
+    private val tenantId = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+
+    private val _storeState = MutableStateFlow<UiState<StoreDetails>>(UiState.Loading)
+    val storeState: StateFlow<UiState<StoreDetails>> = _storeState
+
+
+    init {
+        fetchData()
+    }
+
+    fun fetchData() {
+        viewModelScope.launch {
+            _storeState.value = UiState.Loading
+            try {
+                val store = repository.getStoreById(tenantId)
+                _storeState.value = UiState.Success(store)
+            } catch (e: Exception) {
+                _storeState.value = UiState.Error("Error loading store data: ${e.message ?: "Unknown error"}")
+                e.printStackTrace()
+            }
+        }
+    }
 }
-
-data class StoreDto(
-    val name: String,
-    val description: String? = null,
-    val address: String? = null,
-    val phone: String? = null,
-    val facebookURL: String? = null,
-    val instagramURL: String? = null,
-    val tiktokURL: String? = null
-)

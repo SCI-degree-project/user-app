@@ -10,10 +10,15 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.items
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.userapp.model.ProductItem
 import com.userapp.view.components.profile.StoreProfileComponent
+import com.userapp.viewmodel.profile.StoreProfileViewModel
+import com.userapp.viewmodel.uistate.UiState
 
 @Composable
 fun StaggeredProductGrid(
@@ -21,7 +26,11 @@ fun StaggeredProductGrid(
     modifier: Modifier = Modifier,
     columns: Int = 2,
     onProductClick: (String) -> Unit,
+    profile: Boolean = true,
 ) {
+    val storeViewModel: StoreProfileViewModel = hiltViewModel()
+    val storeUiState by storeViewModel.storeState.collectAsState()
+
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(columns),
         modifier = modifier.fillMaxSize(),
@@ -29,8 +38,20 @@ fun StaggeredProductGrid(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalItemSpacing = 8.dp
     ) {
-        item(span = StaggeredGridItemSpan.FullLine) {
-            StoreProfileComponent()
+        if (profile) {
+            when (storeUiState) {
+                is UiState.Loading -> {}
+
+                is UiState.Success -> {
+                    val store = (storeUiState as UiState.Success).data
+                    item(span = StaggeredGridItemSpan.FullLine) {
+                        StoreProfileComponent(store)
+                    }
+                }
+
+                is UiState.Error -> {}
+
+            }
         }
 
         items(products) { product ->

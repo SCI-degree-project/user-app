@@ -38,7 +38,13 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideMovieApiService(retrofit: Retrofit): ProductsApiService {
+    fun provideProductsApiService(retrofit: Retrofit): ProductsApiService {
         return retrofit.create(ProductsApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideStoresApiService(retrofit: Retrofit): StoresApiService {
+        return retrofit.create(StoresApiService::class.java)
     }
 }

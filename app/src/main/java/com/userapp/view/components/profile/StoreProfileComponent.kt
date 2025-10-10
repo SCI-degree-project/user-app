@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,24 +25,28 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.userapp.R
-import com.userapp.viewmodel.profile.StoreDto
+import com.userapp.model.StoreDetails
+import com.userapp.viewmodel.profile.StoreProfileViewModel
 
 @Composable
-fun StoreProfileComponent() {
-    val store = remember {
-        mutableStateOf(
-            StoreDto(
-                name = "Muebles Cochabamba",
-                description = "Tienda especializada en muebles de alta calidad para el hogar y oficina. Ofrecemos diseños modernos y clásicos, con materiales duraderos y precios competitivos. Visítanos o contáctanos para personalizar tus espacios.",
-                address = "Av. América #123, Cochabamba, Bolivia",
-                phone = "+591 70012345",
-                facebookURL = "https://www.facebook.com/muebles.cochabamba",
-                instagramURL = "https://www.instagram.com/mueblescocha",
-                tiktokURL = "https://www.tiktok.com/@muebles.cochita"
-            )
-        ).value
-    }
+fun StoreProfileComponent(
+    store: StoreDetails
+) {
+//    val store = remember {
+//        mutableStateOf(
+//            StoreDto(
+//                name = "Muebles Cochabamba",
+//                description = "Tienda especializada en muebles de alta calidad para el hogar y oficina. Ofrecemos diseños modernos y clásicos, con materiales duraderos y precios competitivos. Visítanos o contáctanos para personalizar tus espacios.",
+//                address = "Av. América #123, Cochabamba, Bolivia",
+//                phone = "+591 70012345",
+//                facebookURL = "https://www.facebook.com/muebles.cochabamba",
+//                instagramURL = "https://www.instagram.com/mueblescocha",
+//                tiktokURL = "https://www.tiktok.com/@muebles.cochita"
+//            )
+//        ).value
+//    }
 
     var isExpanded by remember { mutableStateOf(false) }
     val maxLines = 3
