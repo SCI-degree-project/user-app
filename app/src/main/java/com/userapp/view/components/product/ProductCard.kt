@@ -76,7 +76,6 @@ fun ProductCard(
                         .padding(4.dp)
                 )
             }
-
         }
     }
 }

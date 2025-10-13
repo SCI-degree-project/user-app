@@ -32,7 +32,6 @@ fun CatalogScreen(
 ) {
     val viewModel: CatalogViewModel = hiltViewModel()
     val uiState by viewModel.productsState.collectAsState()
-
     val storeViewModel: StoreProfileViewModel = hiltViewModel()
     val storeUiState by storeViewModel.storeState.collectAsState()
 
@@ -47,7 +46,7 @@ fun CatalogScreen(
                 .padding(innerPadding),
             contentAlignment = Alignment.Center
         ) {
-            when (uiState) {
+            when (storeUiState) {
                 is UiState.Loading -> {
                     CircularProgressIndicator()
                 }
@@ -61,14 +60,32 @@ fun CatalogScreen(
                     }
                 }
                 is UiState.Success -> {
-                    val products = (uiState as UiState.Success).data
-                    StaggeredProductGrid(
-                        products = products,
-                        modifier = modifier,
-                        onProductClick = onProductClick
-                    )
+                    when (uiState) {
+                        is UiState.Loading -> {
+                            CircularProgressIndicator()
+                        }
+                        is UiState.Error -> {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(text = "Error fetching products...")
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Button(onClick = { viewModel.fetchProducts() }) {
+                                    Text("Retry")
+                                }
+                            }
+                        }
+                        is UiState.Success -> {
+                            val products = (uiState as UiState.Success).data
+                            val storeData = (storeUiState as UiState.Success).data
+                            StaggeredProductGrid(
+                                products = products,
+                                modifier = modifier,
+                                onProductClick = onProductClick,
+                                store = storeData
+                            )
+                        }
+                    }
                 }
             }
-        }
+                   }
     }
 }
