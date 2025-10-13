@@ -16,6 +16,7 @@ import com.userapp.view.screen.Model3DScreen
 import com.userapp.view.screen.ProductDetailScreen
 import com.userapp.view.screen.Screen
 import com.userapp.view.screen.SearchScreen
+import com.userapp.view.theme.UserAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -24,69 +25,76 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val navController = rememberNavController()
-            NavHost(navController = navController, startDestination = Screen.Catalog.route) {
-                composable(Screen.Catalog.route) {
-                    CatalogScreen(
-                        navController = navController,
-                        onProductClick = { productId ->
-                        navController.navigate(Screen.ProductDetail.createRoute(productId))
-                        }
-                    )
-                }
+            UserAppTheme {
+                val navController = rememberNavController()
+                NavHost(navController = navController, startDestination = Screen.Catalog.route) {
+                    composable(
+                        Screen.Catalog.route,
+                    ) {
+                        CatalogScreen(
+                            navController = navController,
+                            onProductClick = { productId ->
+                                navController.navigate(Screen.ProductDetail.createRoute(productId))
+                            }
+                        )
+                    }
 
-                composable(
-                    route = Screen.ProductDetail.route,
-                    arguments = listOf(navArgument("productId") { type = NavType.StringType })
-                ) { backStackEntry ->
-                    val productId = backStackEntry.arguments?.getString("productId") ?: ""
-                    ProductDetailScreen(
-                        productId,
-                        navController,
-                        onARButtonClick = { pId ->
-                            navController.navigate(Screen.ARScreen.createRoute(pId))
-                        },
-                        on3DButtonClick = { pId ->
-                            navController.navigate(Screen.Model3DScreen.createRoute(pId))
-                        }
-                    )
-                }
+                    composable(
+                        route = Screen.ProductDetail.route,
+                        arguments = listOf(navArgument("productId") { type = NavType.StringType })
+                    ) { backStackEntry ->
+                        val productId = backStackEntry.arguments?.getString("productId") ?: ""
+                        ProductDetailScreen(
+                            productId,
+                            navController,
+                            onARButtonClick = { pId ->
+                                navController.navigate(Screen.ARScreen.createRoute(pId))
+                            },
+                            on3DButtonClick = { pId ->
+                                navController.navigate(Screen.Model3DScreen.createRoute(pId))
+                            },
+                            onStoreClick = { sId ->
+                                navController.navigate(Screen.Catalog.route)
+                            },
+                        )
+                    }
 
-                composable(
-                    route = Screen.ARScreen.route,
-                    arguments = listOf(navArgument("productId") { type = NavType.StringType })
-                ) { backStackEntry ->
-                    val productId = backStackEntry.arguments?.getString("productId") ?: ""
-                    ARScreen(productId, navController = navController)
-                }
+                    composable(
+                        route = Screen.ARScreen.route,
+                        arguments = listOf(navArgument("productId") { type = NavType.StringType })
+                    ) { backStackEntry ->
+                        val productId = backStackEntry.arguments?.getString("productId") ?: ""
+                        ARScreen(productId, navController = navController)
+                    }
 
-                composable(
-                    route = Screen.Model3DScreen.route,
-                    arguments = listOf(navArgument("productId") { type = NavType.StringType })
-                ) { backStackEntry ->
-                    val productId = backStackEntry.arguments?.getString("productId") ?: ""
-                    Model3DScreen(
-                        productId,
-                        navController = navController,
-                    )
-                }
+                    composable(
+                        route = Screen.Model3DScreen.route,
+                        arguments = listOf(navArgument("productId") { type = NavType.StringType })
+                    ) { backStackEntry ->
+                        val productId = backStackEntry.arguments?.getString("productId") ?: ""
+                        Model3DScreen(
+                            productId,
+                            navController = navController,
+                        )
+                    }
 
-                composable(Screen.Favorites.route) {
-                    FavoritesScreen(
-                        navController = navController,
-                        onProductClick = { productId ->
-                            navController.navigate(Screen.ProductDetail.createRoute(productId))
-                        }
-                    )
-                }
+                    composable(Screen.Favorites.route) {
+                        FavoritesScreen(
+                            navController = navController,
+                            onProductClick = { productId ->
+                                navController.navigate(Screen.ProductDetail.createRoute(productId))
+                            }
+                        )
+                    }
 
-                composable(Screen.Search.route) {
-                    SearchScreen(
-                        navController = navController,
-                        onProductClick = { productId ->
-                            navController.navigate(Screen.ProductDetail.createRoute(productId))
-                        }
-                    )
+                    composable(Screen.Search.route) {
+                        SearchScreen(
+                            navController = navController,
+                            onProductClick = { productId ->
+                                navController.navigate(Screen.ProductDetail.createRoute(productId))
+                            }
+                        )
+                    }
                 }
             }
         }

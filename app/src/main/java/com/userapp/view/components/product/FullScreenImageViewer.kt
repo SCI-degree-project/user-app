@@ -32,7 +32,7 @@ fun FullscreenImageViewer(
     images: List<String>,
     initialPage: Int,
     productName: String,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     Box(
         modifier = Modifier

@@ -3,6 +3,7 @@ package com.userapp.view.screen
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -50,8 +51,11 @@ import com.userapp.viewmodel.product.ProductDetailsViewModelFactoryProvider
 import com.userapp.viewmodel.uistate.UiState
 import dagger.hilt.android.EntryPointAccessors
 import com.userapp.model.ProductDetails
+import com.userapp.model.StoreDetails
 import com.userapp.view.components.product.ProductActions
+import com.userapp.view.components.profile.StoreProfilePreview
 import com.userapp.viewmodel.favorites.FavoritesViewModel
+import com.userapp.viewmodel.profile.StoreProfileViewModel
 import kotlinx.coroutines.launch
 
 @Composable
@@ -60,7 +64,8 @@ fun ProductDetailScreen(
     navController: NavController,
     modifier: Modifier = Modifier,
     onARButtonClick: (String) -> Unit,
-    on3DButtonClick: (String) -> Unit
+    on3DButtonClick: (String) -> Unit,
+    onStoreClick: (String) -> Unit
 ) {
     val context = LocalContext.current
 
@@ -75,6 +80,9 @@ fun ProductDetailScreen(
         factory.create(productId)
     }
 
+    val storeViewModel: StoreProfileViewModel = hiltViewModel()
+    val storeUiState by storeViewModel.storeState.collectAsState()
+
     val productState by viewModel.productState.collectAsState()
 
     val favoritesViewModel: FavoritesViewModel = hiltViewModel()
@@ -87,18 +95,26 @@ fun ProductDetailScreen(
 
     val coroutineScope = rememberCoroutineScope()
 
+    var isImageFullScreenVisible by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
-            IconButton(
-                onClick = { navController.popBackStack() },
-                modifier = Modifier
-                    .statusBarsPadding()
+            AnimatedVisibility(
+                visible = !isImageFullScreenVisible,
+                enter = fadeIn(),
+                exit = fadeOut()
             ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    tint = Color.Black
-                )
+                IconButton(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier
+                        .statusBarsPadding()
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        tint = Color.Black
+                    )
+                }
             }
         }
     ) { innerPadding ->
@@ -128,8 +144,10 @@ fun ProductDetailScreen(
                 }
 
                 is UiState.Success -> {
+                    val store = (storeUiState as UiState.Success).data
                     ProductDetailContent(
                         product = state.data,
+                        modifier = modifier,
                         onARButtonClick = onARButtonClick,
                         on3DButtonClick = on3DButtonClick,
                         isFavorite = isFavorite,
@@ -137,7 +155,12 @@ fun ProductDetailScreen(
                             coroutineScope.launch {
                                 favoritesViewModel.toggleFavorite(productId)
                             }
-                        }
+                        },
+                        store = store,
+                        onSetFullScreenVisible = { isVisible ->
+                            isImageFullScreenVisible = isVisible
+                        },
+                        onStoreClick = onStoreClick
                     )
                 }
             }
@@ -148,17 +171,26 @@ fun ProductDetailScreen(
 @Composable
 fun ProductDetailContent(
     product: ProductDetails,
+    modifier: Modifier,
     onARButtonClick: (String) -> Unit,
     on3DButtonClick: (String) -> Unit,
     isFavorite: Boolean = false,
-    onToggleFavorite: () -> Unit = {}
+    onToggleFavorite: () -> Unit = {},
+    store: StoreDetails,
+    onSetFullScreenVisible: (Boolean) -> Unit,
+    onStoreClick: (String) -> Unit
 ) {
     var showFullScreenGallery by remember { mutableStateOf(false) }
     var currentFullScreenImageIndex by remember { mutableIntStateOf(0) }
 
+    LaunchedEffect(showFullScreenGallery) {
+        onSetFullScreenVisible(showFullScreenGallery)
+    }
+
     val gallery = product.gallery.ifEmpty {
         listOf("https://via.placeholder.com/600x400?text=No+Image")
     }
+
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
@@ -240,6 +272,11 @@ fun ProductDetailContent(
                     },
                     style = MaterialTheme.typography.bodyLarge
                 )
+
+                Spacer(modifier = Modifier.height(32.dp))
+                Text(text = "Store info", style = MaterialTheme.typography.titleMedium)
+                Spacer(modifier = Modifier.height(4.dp))
+                StoreProfilePreview(modifier = modifier.clickable { onStoreClick(store.id) }, store = store)
             }
         }
 

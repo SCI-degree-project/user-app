@@ -11,7 +11,7 @@ class ProductRepository @Inject constructor(
     private val apiService: ProductsApiService
 ) {
     suspend fun getProducts(tenantId: String, page: Int, size: Int): PaginatedResponse<ProductItem> {
-        return apiService.getMovies(tenantId, page, size)
+        return apiService.getProducts(tenantId, page, size)
     }
 
     suspend fun getProductById(productId: String): ProductDetails {

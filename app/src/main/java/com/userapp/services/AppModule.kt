@@ -29,7 +29,7 @@ object AppModule {
     @Singleton
     fun provideRetrofit(client: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("http://10.42.0.1:7777/")
+            .baseUrl("http://192.168.1.108:7777/")
             .addConverterFactory(GsonConverterFactory.create())
             .client(client)
             .build()
@@ -38,7 +38,13 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideMovieApiService(retrofit: Retrofit): ProductsApiService {
+    fun provideProductsApiService(retrofit: Retrofit): ProductsApiService {
         return retrofit.create(ProductsApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideStoresApiService(retrofit: Retrofit): StoresApiService {
+        return retrofit.create(StoresApiService::class.java)
     }
 }

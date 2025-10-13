@@ -27,8 +27,6 @@ import com.userapp.viewmodel.ar.Product3DModelViewModel
 import com.userapp.viewmodel.ar.Product3DModelViewModelFactoryProvider
 import dagger.hilt.android.EntryPointAccessors
 import io.github.sceneview.Scene
-import io.github.sceneview.math.Position
-import io.github.sceneview.model.engine
 import io.github.sceneview.node.ModelNode
 import io.github.sceneview.node.Node
 import io.github.sceneview.rememberCameraNode
