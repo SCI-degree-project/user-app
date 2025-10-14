@@ -26,10 +26,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import coil.compose.rememberAsyncImagePainter
 import com.userapp.R
+import com.userapp.model.GalleryItemDetails
 
 @Composable
 fun FullscreenImageViewer(
-    images: List<String>,
+    images: List<GalleryItemDetails>,
     initialPage: Int,
     productName: String,
     onDismiss: () -> Unit,
@@ -51,7 +52,7 @@ fun FullscreenImageViewer(
             modifier = Modifier.fillMaxSize()
         ) { page ->
             Image(
-                painter = rememberAsyncImagePainter(images[page]),
+                painter = rememberAsyncImagePainter(images[page].imageUrl),
                 contentDescription = productName,
                 modifier = Modifier.fillMaxSize()
             )

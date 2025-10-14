@@ -30,8 +30,9 @@ class CatalogViewModel @Inject constructor(
         viewModelScope.launch {
             _productsState.value = UiState.Loading
             try {
-                val products = repository.getProducts(tenantId, page, size)
-                _productsState.value = UiState.Success(products.content)
+                val pagedProducts = repository.getProducts(tenantId, page, size)
+
+                _productsState.value = UiState.Success(pagedProducts.content)
             } catch (e: Exception) {
                 _productsState.value = UiState.Error("Error loading products: ${e.message ?: "Unknown error"}")
                 e.printStackTrace()

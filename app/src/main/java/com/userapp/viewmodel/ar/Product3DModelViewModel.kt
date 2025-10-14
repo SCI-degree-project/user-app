@@ -23,7 +23,7 @@ class Product3DModelViewModel @AssistedInject constructor(
         viewModelScope.launch {
             try {
                 val product = repository.getProductById(productId)
-                _modelUrl.value = product.model.takeIf { it.isNotEmpty() }
+                _modelUrl.value = product.media.model.takeIf { it.isNotEmpty() }
             } catch (e: Exception) {
                 _modelUrl.value = null
             }

@@ -187,9 +187,7 @@ fun ProductDetailContent(
         onSetFullScreenVisible(showFullScreenGallery)
     }
 
-    val gallery = product.gallery.ifEmpty {
-        listOf("https://via.placeholder.com/600x400?text=No+Image")
-    }
+    val gallery = product.media.gallery
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -244,23 +242,27 @@ fun ProductDetailContent(
             Column {
                 ProductActions(
                     productId = product.id,
-                    modelUrl = product.model,
+                    modelUrl = product.media.model,
                     on3DButtonClick = on3DButtonClick,
                     onARButtonClick = onARButtonClick
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
-                Text(
-                    text = product.description.ifBlank { "No description" },
-                    style = MaterialTheme.typography.bodyLarge
-                )
+                product.description?.let {
+                    Text(
+                        text = it.ifBlank { "No description" },
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(text = "Style", style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = product.style.ifBlank { "Undefined" },
-                    style = MaterialTheme.typography.bodyLarge
-                )
+                product.style?.let {
+                    Text(
+                        text = it.ifBlank { "Undefined" },
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(text = "Materials", style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.height(4.dp))
@@ -272,6 +274,31 @@ fun ProductDetailContent(
                     },
                     style = MaterialTheme.typography.bodyLarge
                 )
+                Spacer(modifier = Modifier.height(8.dp))
+                if (product.dimensions != null) {
+                    Text(
+                        text = "Dimensions",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    product.dimensions.width.let { width ->
+                        Text(
+                            text = "\t• Width: $width",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                    product.dimensions.height.let { height ->
+                        Text(
+                            text = "\t• Height: $height",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                    product.dimensions.depth.let { depth ->
+                        Text(
+                            text = "\t• Depth: $depth",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
 
                 Spacer(modifier = Modifier.height(32.dp))
                 Text(text = "Store info", style = MaterialTheme.typography.titleMedium)
