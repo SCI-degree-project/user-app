@@ -86,6 +86,6 @@ fun CatalogScreen(
                     }
                 }
             }
-                   }
+        }
     }
 }

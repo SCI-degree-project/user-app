@@ -30,7 +30,7 @@ object DatabaseModule {
     }
 
     @Provides
-    fun provideMovieDao(database: AppDatabase): ProductDao {
+    fun provideProductDao(database: AppDatabase): ProductDao {
         return database.productDao()
     }
 

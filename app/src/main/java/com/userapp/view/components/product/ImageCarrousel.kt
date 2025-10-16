@@ -25,10 +25,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
+import com.userapp.model.GalleryItemDetails
 
 @Composable
 fun ImageCarousel(
-    images: List<String>,
+    images: List<GalleryItemDetails>,
     productName: String,
     onImageClick: (index: Int) -> Unit
 ) {
@@ -57,7 +58,7 @@ fun ImageCarousel(
                 }
         ) { page ->
             Image(
-                painter = rememberAsyncImagePainter(images[page]),
+                painter = rememberAsyncImagePainter(images[page].imageUrl),
                 contentDescription = productName,
                 modifier = Modifier
                     .fillMaxWidth()
