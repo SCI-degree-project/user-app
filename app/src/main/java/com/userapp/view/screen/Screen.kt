@@ -1,7 +1,11 @@
 package com.userapp.view.screen
 
 sealed class Screen(val route: String) {
-    object Catalog : Screen("catalog")
+    object Home : Screen("home")
+
+    object Store : Screen("store/{storeId}") {
+        fun createRoute(storeId: String) = "store/$storeId"
+    }
 
     object ProductDetail : Screen("productDetail/{productId}") {
         fun createRoute(productId: String) = "productDetail/$productId"

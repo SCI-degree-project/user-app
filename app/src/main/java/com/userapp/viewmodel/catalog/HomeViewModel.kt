@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class CatalogViewModel @Inject constructor(
+class HomeViewModel @Inject constructor(
     private val repository: ProductRepository
 ) : ViewModel() {
     private val _productsState = MutableStateFlow<UiState<List<ProductItem>>>(UiState.Loading)
@@ -20,7 +20,6 @@ class CatalogViewModel @Inject constructor(
 
     private var page = 0
     private val size = 20
-    private val tenantId = "3fa85f64-5717-4562-b3fc-2c963f66afa6"
 
     init {
         fetchProducts()
@@ -30,7 +29,7 @@ class CatalogViewModel @Inject constructor(
         viewModelScope.launch {
             _productsState.value = UiState.Loading
             try {
-                val pagedProducts = repository.getProducts(tenantId, page, size)
+                val pagedProducts = repository.getScoredProducts(page, size)
 
                 _productsState.value = UiState.Success(pagedProducts.content)
             } catch (e: Exception) {

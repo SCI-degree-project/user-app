@@ -10,12 +10,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.userapp.view.screen.ARScreen
-import com.userapp.view.screen.CatalogScreen
+import com.userapp.view.screen.HomeScreen
 import com.userapp.view.screen.FavoritesScreen
 import com.userapp.view.screen.Model3DScreen
 import com.userapp.view.screen.ProductDetailScreen
 import com.userapp.view.screen.Screen
 import com.userapp.view.screen.SearchScreen
+import com.userapp.view.screen.StoreScreen
 import com.userapp.view.theme.UserAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -27,12 +28,26 @@ class MainActivity : ComponentActivity() {
         setContent {
             UserAppTheme {
                 val navController = rememberNavController()
-                NavHost(navController = navController, startDestination = Screen.Catalog.route) {
+                NavHost(navController = navController, startDestination = Screen.Home.route) {
                     composable(
-                        Screen.Catalog.route,
+                        Screen.Home.route,
                     ) {
-                        CatalogScreen(
+                        HomeScreen(
                             navController = navController,
+                            onProductClick = { productId ->
+                                navController.navigate(Screen.ProductDetail.createRoute(productId))
+                            }
+                        )
+                    }
+
+                    composable(
+                        route = Screen.Store.route,
+                        arguments = listOf(navArgument("storeId") { type = NavType.StringType})
+                    ) { backStackEntry ->
+                        val storeId = backStackEntry.arguments?.getString("storeId") ?: ""
+                        StoreScreen(
+                            storeId,
+                            navController,
                             onProductClick = { productId ->
                                 navController.navigate(Screen.ProductDetail.createRoute(productId))
                             }
@@ -54,7 +69,7 @@ class MainActivity : ComponentActivity() {
                                 navController.navigate(Screen.Model3DScreen.createRoute(pId))
                             },
                             onStoreClick = { sId ->
-                                navController.navigate(Screen.Catalog.route)
+                                navController.navigate(Screen.Store.createRoute(sId))
                             },
                         )
                     }

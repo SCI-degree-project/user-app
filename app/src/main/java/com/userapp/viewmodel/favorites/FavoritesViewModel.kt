@@ -6,6 +6,7 @@ import com.userapp.data.ProductRepository
 import com.userapp.database.dao.ProductDao
 import com.userapp.database.entities.FavoriteProductEntity
 import com.userapp.model.ProductItem
+import com.userapp.viewmodel.uistate.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,8 +19,8 @@ class FavoritesViewModel @Inject constructor(
     private val dao: ProductDao
 ) : ViewModel() {
 
-    private val _favorites = MutableStateFlow<List<ProductItem>>(emptyList())
-    val favorites: StateFlow<List<ProductItem>> = _favorites
+    private val _favoritesState = MutableStateFlow<UiState<List<ProductItem>>>(UiState.Loading)
+    val favoritesState: StateFlow<UiState<List<ProductItem>>> = _favoritesState
 
     private val _isFavorite = MutableStateFlow(false)
     val isFavorite: StateFlow<Boolean> = _isFavorite
@@ -32,11 +33,19 @@ class FavoritesViewModel @Inject constructor(
 
     fun getFavorites() {
         viewModelScope.launch {
-            val favoriteEntities = dao.getFavoriteProducts()
-            val ids = favoriteEntities.map { it.productId }
-            if (ids.isNotEmpty()) {
-                val products = repository.getProductsBatch(ids)
-                _favorites.value = products
+            _favoritesState.value = UiState.Loading
+            try {
+                val favoriteEntities = dao.getFavoriteProducts()
+                val ids = favoriteEntities.map { it.productId }
+                if (ids.isNotEmpty()) {
+                    val products = repository.getProductsBatch(ids)
+                    _favoritesState.value = UiState.Success(products)
+                } else {
+                    _favoritesState.value = UiState.Success(emptyList())
+                }
+            } catch (e: Exception) {
+                _favoritesState.value = UiState.Error("Error loading favorites: ${e.message ?: "Unknown error"}")
+                e.printStackTrace()
             }
         }
     }

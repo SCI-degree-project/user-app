@@ -22,6 +22,7 @@ import com.userapp.model.ProductItem
 fun ProductCard(
     product: ProductItem,
     modifier: Modifier = Modifier,
+    customAspectRation: Boolean = true
 ) {
     val imageUrl = product.cover.orEmpty()
 
@@ -37,7 +38,7 @@ fun ProductCard(
                 contentDescription = product.name,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(if (product.aspectRatio > 0f) product.aspectRatio else 1f)
+                    .aspectRatio(if (product.aspectRatio > 0f && customAspectRation) product.aspectRatio else 1f)
                     .clip(RoundedCornerShape(16.dp)),
                 contentScale = ContentScale.Crop,
 

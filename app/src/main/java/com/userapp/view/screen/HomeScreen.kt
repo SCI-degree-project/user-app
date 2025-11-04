@@ -20,20 +20,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.userapp.view.components.navbar.BottomNavigationBar
 import com.userapp.view.components.product.StaggeredProductGrid
-import com.userapp.viewmodel.catalog.CatalogViewModel
-import com.userapp.viewmodel.profile.StoreProfileViewModel
+import com.userapp.viewmodel.catalog.HomeViewModel
 import com.userapp.viewmodel.uistate.UiState
 
 @Composable
-fun CatalogScreen(
+fun HomeScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
     onProductClick: (String) -> Unit
 ) {
-    val viewModel: CatalogViewModel = hiltViewModel()
+    val viewModel: HomeViewModel = hiltViewModel()
     val uiState by viewModel.productsState.collectAsState()
-    val storeViewModel: StoreProfileViewModel = hiltViewModel()
-    val storeUiState by storeViewModel.storeState.collectAsState()
 
     Scaffold(
         bottomBar = {
@@ -46,13 +43,13 @@ fun CatalogScreen(
                 .padding(innerPadding),
             contentAlignment = Alignment.Center
         ) {
-            when (storeUiState) {
+            when (uiState) {
                 is UiState.Loading -> {
                     CircularProgressIndicator()
                 }
                 is UiState.Error -> {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = "Internal Server Error")
+                        Text(text = "Error fetching products...")
                         Spacer(modifier = Modifier.height(16.dp))
                         Button(onClick = { viewModel.fetchProducts() }) {
                             Text("Retry")
@@ -60,30 +57,13 @@ fun CatalogScreen(
                     }
                 }
                 is UiState.Success -> {
-                    when (uiState) {
-                        is UiState.Loading -> {
-                            CircularProgressIndicator()
-                        }
-                        is UiState.Error -> {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(text = "Error fetching products...")
-                                Spacer(modifier = Modifier.height(16.dp))
-                                Button(onClick = { viewModel.fetchProducts() }) {
-                                    Text("Retry")
-                                }
-                            }
-                        }
-                        is UiState.Success -> {
-                            val products = (uiState as UiState.Success).data
-                            val storeData = (storeUiState as UiState.Success).data
-                            StaggeredProductGrid(
-                                products = products,
-                                modifier = modifier,
-                                onProductClick = onProductClick,
-                                store = storeData
-                            )
-                        }
-                    }
+                    val products = (uiState as UiState.Success).data
+                    StaggeredProductGrid(
+                        products = products,
+                        modifier = modifier,
+                        onProductClick = onProductClick,
+                        profile = false
+                    )
                 }
             }
         }

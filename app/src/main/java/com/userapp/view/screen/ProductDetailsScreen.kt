@@ -47,13 +47,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.userapp.R
-import com.userapp.viewmodel.product.ProductDetailsViewModelFactoryProvider
+import com.userapp.viewmodel.ProductDetailsViewModelFactoryProvider
 import com.userapp.viewmodel.uistate.UiState
 import dagger.hilt.android.EntryPointAccessors
 import com.userapp.model.ProductDetails
 import com.userapp.model.StoreDetails
+import com.userapp.view.components.navbar.BottomNavigationBar
 import com.userapp.view.components.product.ProductActions
 import com.userapp.view.components.profile.StoreProfilePreview
+import com.userapp.viewmodel.StoreViewModelFactoryProvider
 import com.userapp.viewmodel.favorites.FavoritesViewModel
 import com.userapp.viewmodel.profile.StoreProfileViewModel
 import kotlinx.coroutines.launch
@@ -69,32 +71,32 @@ fun ProductDetailScreen(
 ) {
     val context = LocalContext.current
 
-    val factory = remember {
+    val productFactory = remember {
         EntryPointAccessors.fromApplication(
             context.applicationContext,
             ProductDetailsViewModelFactoryProvider::class.java
         ).productDetailsViewModelFactory()
     }
-
     val viewModel: ProductDetailsViewModel = remember {
-        factory.create(productId)
+        productFactory.create(productId)
     }
-
-    val storeViewModel: StoreProfileViewModel = hiltViewModel()
-    val storeUiState by storeViewModel.storeState.collectAsState()
-
     val productState by viewModel.productState.collectAsState()
+
+    val storeFactory = remember {
+        EntryPointAccessors.fromApplication(
+            context.applicationContext,
+            StoreViewModelFactoryProvider::class.java
+        ).storeViewModelFactory()
+    }
 
     val favoritesViewModel: FavoritesViewModel = hiltViewModel()
 
     LaunchedEffect(productId) {
         favoritesViewModel.checkIfFavorite(productId)
     }
-
     val isFavorite by favoritesViewModel.isFavorite.collectAsState()
 
     val coroutineScope = rememberCoroutineScope()
-
     var isImageFullScreenVisible by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -116,6 +118,9 @@ fun ProductDetailScreen(
                     )
                 }
             }
+        },
+        bottomBar = {
+            BottomNavigationBar(navController)
         }
     ) { innerPadding ->
         Box(
@@ -144,24 +149,60 @@ fun ProductDetailScreen(
                 }
 
                 is UiState.Success -> {
-                    val store = (storeUiState as UiState.Success).data
-                    ProductDetailContent(
-                        product = state.data,
-                        modifier = modifier,
-                        onARButtonClick = onARButtonClick,
-                        on3DButtonClick = on3DButtonClick,
-                        isFavorite = isFavorite,
-                        onToggleFavorite = {
-                            coroutineScope.launch {
-                                favoritesViewModel.toggleFavorite(productId)
-                            }
-                        },
-                        store = store,
-                        onSetFullScreenVisible = { isVisible ->
-                            isImageFullScreenVisible = isVisible
-                        },
-                        onStoreClick = onStoreClick
-                    )
+                    val product = state.data
+                    val storeId = product.tenantId
+
+                    val storeViewModel: StoreProfileViewModel = remember(storeId) {
+                        storeFactory.create(storeId)
+                    }
+
+                    val storeState by storeViewModel.storeState.collectAsState()
+
+                    when (val sState = storeState) {
+                        is UiState.Loading -> {
+                            CircularProgressIndicator()
+                        }
+                        is UiState.Error -> {
+                            Text(text = "Could not load store data.", color = MaterialTheme.colorScheme.error)
+                            ProductDetailContent(
+                                product = product,
+                                modifier = modifier,
+                                onARButtonClick = onARButtonClick,
+                                on3DButtonClick = on3DButtonClick,
+                                isFavorite = isFavorite,
+                                onToggleFavorite = {
+                                    coroutineScope.launch {
+                                        favoritesViewModel.toggleFavorite(productId)
+                                    }
+                                },
+                                store = StoreDetails(id = storeId, name = "Store Load Error"),
+                                onSetFullScreenVisible = { isVisible ->
+                                    isImageFullScreenVisible = isVisible
+                                },
+                                onStoreClick = onStoreClick
+                            )
+                        }
+                        is UiState.Success -> {
+                            val store = sState.data
+                            ProductDetailContent(
+                                product = product,
+                                modifier = modifier,
+                                onARButtonClick = onARButtonClick,
+                                on3DButtonClick = on3DButtonClick,
+                                isFavorite = isFavorite,
+                                onToggleFavorite = {
+                                    coroutineScope.launch {
+                                        favoritesViewModel.toggleFavorite(productId)
+                                    }
+                                },
+                                store = store,
+                                onSetFullScreenVisible = { isVisible ->
+                                    isImageFullScreenVisible = isVisible
+                                },
+                                onStoreClick = onStoreClick
+                            )
+                        }
+                    }
                 }
             }
         }
